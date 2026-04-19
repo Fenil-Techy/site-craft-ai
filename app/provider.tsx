@@ -9,7 +9,7 @@ function Provider({
     children: React.ReactNode
   }) {
 
-    const [userDetail,setUserDetail]=useState<unknown | null>(null)
+    const [userDetail,setUserDetail]=useState<AppUser | null>(null)
 
     const{user}=useUser()
 

@@ -1,11 +1,13 @@
 'use client'
 import { Button } from '@/components/ui/button';
-import { SignInButton } from '@clerk/nextjs';
+import { SignInButton, useUser } from '@clerk/nextjs';
 import { ArrowRightIcon } from 'lucide-react';
 import Image from 'next/image'
 
 
 function Header() {
+  
+
   const menu = [
     {
       name: 'Pricing',
@@ -22,7 +24,7 @@ function Header() {
       {/* logo & name */}
 
       <div className='flex gap-2 items-center'>
-        <Image src="/logo.png" alt="logo" width={50} height={200} />
+        <Image src="/logo.png" alt="logo" width={50} height={50} />
         <h2 className='text-2xl font-bold'>AI CraftShip</h2>
       </div>
 
@@ -39,7 +41,7 @@ function Header() {
       {/* CTA button */}
 
       <div>
-      <SignInButton mode="modal" forceRedirectUrl={"/workspace"}><Button>Get Started <ArrowRightIcon /></Button></SignInButton>
+        <SignInButton mode="modal" forceRedirectUrl={"/workspace"}><Button>Get Started <ArrowRightIcon size={10} /></Button></SignInButton>  
       </div>
     </div>
   )

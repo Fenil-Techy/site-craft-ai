@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import Provider from "./provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -27,7 +28,10 @@ export default function RootLayout({
       <body className={poppins.className}>
         <ClerkProvider>
           <Provider>
-        <TooltipProvider>{children}</TooltipProvider>
+        <TooltipProvider>
+          {children}
+          <Toaster/>
+          </TooltipProvider>
           </Provider>
         </ClerkProvider>
       </body>
