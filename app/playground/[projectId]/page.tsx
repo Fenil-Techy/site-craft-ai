@@ -52,6 +52,8 @@ OUTPUT RULES:
 - Return ONLY <body> HTML
 - No explanations, no markdown, no comments outside HTML
 - Do NOT include <html>, <head>, or <!DOCTYPE>
+- Start the response with exactly: [[MODE:CODE]]
+- After that marker, return only the HTML body content
 
 ----------------------------
 
@@ -117,12 +119,15 @@ If the user is NOT asking for UI:
 Respond normally in a friendly, helpful tone.
 
 Do NOT generate HTML.
+- Start the response with exactly: [[MODE:CHAT]]
+- After that marker, return only plain text response
 
 ----------------------------
 
 FINAL RULE:
 Make the UI feel like a real startup product, not AI-generated.
 Avoid generic layouts. Always adapt to the user’s intent.
+Do not output anything before the mode marker.
 `;
 
 function Playground() {
@@ -131,7 +136,7 @@ function Playground() {
     const frameId=params.get('frameId')
     const [frameDetail,setFrameDetail]=useState<Frame>()
     const[loading,setLoading]=useState(false)
-    const[generatedCode,setGeneratedCode]=useState<string>()
+    const[generatedCode,setGeneratedCode]=useState<string>("")
 
     const [messages,setMessages]=useState<Messages[]>()
 
@@ -181,7 +186,9 @@ function Playground() {
         const decoder = new TextDecoder();
         
         let fullText = "";
-        let isCode = false; // 👈 added
+        let rawResponse = "";
+        let eventBuffer = "";
+        let mode: "code" | "chat" | null = null;
     
         // reset previous code
         setGeneratedCode("");
@@ -191,10 +198,14 @@ function Playground() {
           if (done) break;
     
           const chunk = decoder.decode(value, { stream: true });
-          
-    
-          const lines = chunk.split("\n").filter(line => line.trim() !== "");    
-          for (const line of lines) {
+
+          eventBuffer += chunk;
+          const lines = eventBuffer.split("\n");
+          eventBuffer = lines.pop() ?? "";
+
+          for (const rawLine of lines) {
+            const line = rawLine.trim();
+            if (!line) continue;
             if (!line.startsWith("data: ")) continue;
     
             const data = line.replace("data: ", "");
@@ -207,19 +218,30 @@ function Playground() {
     
               if (!text) continue;
     
-              fullText += text;
-    
-              // 🔥 detect HTML once
-              if (!isCode && fullText.includes("<")) {
-                isCode = true;
+              rawResponse += text;
+
+              if (!mode) {
+                const modeMatch = rawResponse.match(/^\s*\[\[MODE:(CODE|CHAT)\]\]/);
+                if (modeMatch) {
+                  mode = modeMatch[1] === "CODE" ? "code" : "chat";
+                }
               }
-    
-              // ✅ only update code if it's HTML
-              if (isCode) {
-                setGeneratedCode((prev: any) => (prev || "") + text);
+
+              const cleanedText = rawResponse
+                .replace(/^\s*\[\[MODE:(?:CODE|CHAT)\]\]\s*/, "");
+              fullText = cleanedText;
+
+              if (mode === "code") {
+                setGeneratedCode(cleanedText);
               }
-            } catch (err) {}
+            } catch {}
           }
+        }
+
+        // fallback when model misses marker
+        if (!mode) {
+          const htmlSignal = /<(main|section|div|header|footer|nav|article|aside|form|body)\b/i;
+          mode = htmlSignal.test(fullText) ? "code" : "chat";
         }
     
         // ✅ final message depends on type
@@ -227,12 +249,14 @@ function Playground() {
           ...(prev || []),
           {
             role: "assistant",
-            content: isCode
-              ? "Your code is ready"
+            content: mode === "code"
+              ? "Your beautiful website code is ready"
               : fullText,
             },
           ]);
-          await SaveGeneratedCode(fullText)
+          if (mode === "code") {
+            await SaveGeneratedCode(fullText);
+          }
       } catch (error) {
         console.error("Error:", error);
         
