@@ -145,16 +145,25 @@ function Playground() {
       void axios.get(`/api/frames?frameId=${frameId}&projectId=${projectId}`).then((result)=>{
         console.log(result.data)
         setFrameDetail(result.data)
-        const designCode=result.data?.designCode;
-        const index=designCode.indexOf("```html")+7
-        const formattedCode=designCode.slice(index)
-        setGeneratedCode(formattedCode)
-        if(result.data?.chatMessages?.length===1){
+        const designCode = result.data?.designCode;
+        const hasStoredDesignCode =
+          typeof designCode === "string" && designCode.trim().length > 0;
+        if (hasStoredDesignCode) {
+          const codeFence = "```html";
+          const index = designCode.indexOf(codeFence);
+          const formattedCode =
+            index >= 0
+              ? designCode.slice(index + codeFence.length).trimStart()
+              : designCode;
+          setGeneratedCode(formattedCode);
+        } else {
+          setGeneratedCode("");
+        }
+        setMessages(result.data?.chatMessages ?? []);
+        if(result.data?.chatMessages?.length===1 && !hasStoredDesignCode){
           const userMsg=result.data?.chatMessages[0].content
           // eslint-disable-next-line react-hooks/immutability
           SendMessage(userMsg)
-        }else{
-          setMessages(result.data?.chatMessages)
         }
       })
     },[frameId,projectId])
