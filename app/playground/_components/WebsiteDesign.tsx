@@ -1,6 +1,8 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import WebpageTool from './WebpageTool';
+import ElementSettingSection from './ElementSettingSection';
+import ImageSettingSection from './ImageSetting';
 
 type Props = {
     generatedCode: string
@@ -39,8 +41,15 @@ function WebsiteDesign({ generatedCode }: Props) {
 
     const [screenSize, setScreenSize] = useState('desktop')
     const [selectedElementLabel, setSelectedElementLabel] = useState<string>("No component selected")
+    const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null)
 
     const iframeRef = useRef<HTMLIFrameElement>(null);
+    const selectedElementRef = useRef<HTMLElement | null>(null);
+    const clearSelectionRef = useRef<() => void>(() => { });
+
+    const clearSelectedElement = useCallback(() => {
+        clearSelectionRef.current();
+    }, []);
 
 
     // Initialize iframe shell once
@@ -55,7 +64,6 @@ function WebsiteDesign({ generatedCode }: Props) {
         doc.close();
 
         let hoverEl: HTMLElement | null = null;
-        let selectedEl: HTMLElement | null = null;
 
 
 
@@ -90,7 +98,7 @@ function WebsiteDesign({ generatedCode }: Props) {
         };
 
         const handleMouseOver = (e: MouseEvent) => {
-            if (selectedEl) return;
+            if (selectedElementRef.current) return;
             const target = resolveSelectableTarget(e.target);
             if (!target) return;
             if (hoverEl && hoverEl !== target) {
@@ -101,7 +109,7 @@ function WebsiteDesign({ generatedCode }: Props) {
         };
 
         const handleMouseOut = () => {
-            if (selectedEl) return;
+            if (selectedElementRef.current) return;
             if (hoverEl) {
                 hoverEl.style.outline = "";
                 hoverEl = null;
@@ -119,11 +127,13 @@ function WebsiteDesign({ generatedCode }: Props) {
         };
 
         const clearSelection = () => {
+            const selectedEl = selectedElementRef.current;
             if (!selectedEl) return;
             selectedEl.style.outline = "";
             selectedEl.removeAttribute("contenteditable");
             selectedEl.removeEventListener("blur", handleBlur);
-            selectedEl = null;
+            selectedElementRef.current = null;
+            setSelectedElement(null);
             setSelectedElementLabel("No component selected");
         };
 
@@ -133,23 +143,25 @@ function WebsiteDesign({ generatedCode }: Props) {
             const target = resolveSelectableTarget(e.target);
             if (!target) return;
 
-            if (selectedEl && selectedEl !== target) {
-                selectedEl.style.outline = "";
-                selectedEl.removeAttribute("contenteditable");
-                selectedEl.removeEventListener("blur", handleBlur);
+            const currentSelectedEl = selectedElementRef.current;
+            if (currentSelectedEl && currentSelectedEl !== target) {
+                currentSelectedEl.style.outline = "";
+                currentSelectedEl.removeAttribute("contenteditable");
+                currentSelectedEl.removeEventListener("blur", handleBlur);
             }
 
-            selectedEl = target;
-            selectedEl.style.outline = "2px solid red";
-            selectedEl.setAttribute("contenteditable", "true");
-            selectedEl.addEventListener("blur", handleBlur);
-            selectedEl.focus();
-            setSelectedElementLabel(getElementLabel(selectedEl));
-            console.log("Selected element:", selectedEl);
+            selectedElementRef.current = target;
+            target.style.outline = "2px solid red";
+            target.setAttribute("contenteditable", "true");
+            target.addEventListener("blur", handleBlur);
+            target.focus();
+            setSelectedElementLabel(getElementLabel(target));
+            setSelectedElement(target)
 
         };
 
         const handleBlur = () => {
+            const selectedEl = selectedElementRef.current;
             if (selectedEl) {
                 console.log("Final edited element:", selectedEl.outerHTML);
             }
@@ -157,10 +169,13 @@ function WebsiteDesign({ generatedCode }: Props) {
 
 
         const handleKeyDown = (e: KeyboardEvent) => {
+            const selectedEl = selectedElementRef.current;
             if (e.key === "Escape" && selectedEl) {
                 clearSelection();
             }
         };
+
+        clearSelectionRef.current = clearSelection;
 
         doc.addEventListener("mouseover", handleMouseOver, true);
         doc.addEventListener("mouseout", handleMouseOut, true);
@@ -187,15 +202,18 @@ function WebsiteDesign({ generatedCode }: Props) {
 
         const root = doc.getElementById("root");
         if (root) {
+            clearSelectedElement();
             root.innerHTML =
                 generatedCode
                     ?.replaceAll("```html", "")
                     .replaceAll("```", "")
                     .replace("html", "") ?? "";
         }
-    }, [generatedCode]);
+    }, [generatedCode, clearSelectedElement]);
 
     return (
+        <div className='flex gap-2 w-full'>
+
         <div className='p-5 w-full flex justify-center items-center flex-col'>
 
             <iframe
@@ -207,6 +225,12 @@ function WebsiteDesign({ generatedCode }: Props) {
                 Selected: {selectedElementLabel}
             </div>
             <WebpageTool screenSize={screenSize} setScreenSize={(v: string) => setScreenSize(v)} code={generatedCode} />
+        </div>
+        {selectedElement?.tagName === "IMG" ? (
+            <ImageSettingSection selectedElement={selectedElement as HTMLImageElement} />
+        ) : selectedElement ? (
+            <ElementSettingSection selectedElement={selectedElement} clearSelection={clearSelectedElement} />
+        ) : null}
         </div>
     );
 }

@@ -311,7 +311,7 @@ function Playground() {
         <div className='flex'>
         <ChatSection messages={messages ?? []} onSend={(input:string)=>SendMessage(input)} loading={loading}/>
         <WebsiteDesign generatedCode={generatedCode}/>
-        {/* <SettingSection/> */}
+        
         </div>
     </div>
   )
