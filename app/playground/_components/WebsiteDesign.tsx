@@ -1,8 +1,12 @@
 'use client'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import WebpageTool from './WebpageTool';
 import ElementSettingSection from './ElementSettingSection';
 import ImageSettingSection from './ImageSetting';
+import { OnSaveContext } from '@/context/OnSaveContext';
+import { toast } from 'sonner';
+import { useParams, useSearchParams } from 'next/navigation';
+import axios from 'axios';
 
 type Props = {
     generatedCode: string
@@ -42,10 +46,14 @@ function WebsiteDesign({ generatedCode }: Props) {
     const [screenSize, setScreenSize] = useState('desktop')
     const [selectedElementLabel, setSelectedElementLabel] = useState<string>("No component selected")
     const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null)
-
+    const{onSave,setOnSave}=useContext(OnSaveContext)
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const selectedElementRef = useRef<HTMLElement | null>(null);
     const clearSelectionRef = useRef<() => void>(() => { });
+
+    const{projectId}=useParams()
+    const params=useSearchParams()
+    const frameId=params.get('frameId')
 
     const clearSelectedElement = useCallback(() => {
         clearSelectionRef.current();
@@ -210,6 +218,40 @@ function WebsiteDesign({ generatedCode }: Props) {
                     .replace("html", "") ?? "";
         }
     }, [generatedCode, clearSelectedElement]);
+
+    useEffect(()=>{
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, react-hooks/immutability
+        onSave && HandleOnSave()
+    },[onSave])
+
+    const HandleOnSave=async()=>{
+        if(iframeRef.current){
+            try {
+                const iframeDoc=iframeRef.current.contentDocument
+                || iframeRef.current.contentWindow?.document
+
+                if(iframeDoc){
+                    const cloneDoc=iframeDoc.documentElement.cloneNode(true) as HTMLElement
+                    const allEle=cloneDoc.querySelectorAll<HTMLElement>("*")
+                    allEle.forEach(el => {
+                        el.style.outline='';
+                        el.style.cursor='';
+                    });
+                    const html=cloneDoc.outerHTML
+                    console.log(html)
+                    const result = await axios.put("/api/frames",{
+                        designCode:html,
+                        frameId:frameId,projectId:projectId
+                      })
+                      console.log(result.data)
+                      toast.success("Saved Successfully")
+                }
+
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    }
 
     return (
         <div className='flex gap-2 w-full'>

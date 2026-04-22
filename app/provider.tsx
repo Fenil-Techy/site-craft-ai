@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useUser } from '@clerk/nextjs'
 import UserDetailContext from '@/context/UserDetailContext'
+import { OnSaveContext } from '@/context/OnSaveContext'
 function Provider({
     children,
   }: {
@@ -10,6 +11,8 @@ function Provider({
   }) {
 
     const [userDetail,setUserDetail]=useState<AppUser | null>(null)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const[onSave,setOnSave]=useState<any>(null)
 
     const{user}=useUser()
 
@@ -25,7 +28,9 @@ function Provider({
   return (
     <div>
         <UserDetailContext.Provider value={{userDetail,setUserDetail}}>
+          <OnSaveContext.Provider value={{onSave,setOnSave}}>
         {children}
+          </OnSaveContext.Provider>
         </UserDetailContext.Provider>
         </div>
   )
