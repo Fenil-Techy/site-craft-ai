@@ -1,10 +1,11 @@
 'use client';
 import { Button } from '@/components/ui/button'
-import { SignInButton, useUser } from '@clerk/nextjs';
+import UserDetailContext from '@/context/UserDetailContext';
+import { SignInButton, useAuth, useUser } from '@clerk/nextjs';
 import axios from 'axios';
 import { ArrowUp, ImagePlus, Layout, LayoutDashboard, Loader, Loader2Icon, ShoppingCart, Sparkles, User } from 'lucide-react'
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 function Hero() {
@@ -12,8 +13,23 @@ function Hero() {
     const[userInput,setUserInput]=useState<string>()
     const {user,isLoaded}=useUser()
     const[loading,setLoading]=useState(false)
+    const context = useContext(UserDetailContext)
+
+    if (!context) {
+        throw new Error("UserDetailContext not provided")
+    }
+
+    const { userDetail, setUserDetail } = context
+    const {has}=useAuth()
+    const hasUnlimitedAcess=has({plan:'pro'})
 
     const CreateNewProject=async()=>{
+      // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+      if(!hasUnlimitedAcess&&userDetail?.credits!<=0){
+        toast.error("You have no credits left. Please upgrade to unlimited")
+        return;
+      }
+
       setLoading(true)
       const projectId=uuidv4()
       const frameId=generateRandomFrameNumber()
@@ -25,11 +41,17 @@ function Hero() {
         const result=await axios.post("/api/projects",{
           projectId:projectId,
           frameId:frameId,
-          messages:messages
+          messages:messages,
+          credits:userDetail?.credits
         })
         console.log(result.data)
         toast.success('Project created')
         router.push(`/playground/${projectId}?frameId=${frameId}`)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setUserDetail((prev:any)=>({
+          ...prev,
+          credits:prev?.credits-1
+        }))
         setLoading(false)
       } catch (error) {
         toast.error("Internal server error")
@@ -76,14 +98,14 @@ function Hero() {
     <div className='flex flex-col items-center justify-center h-[80vh]'>
 
         {/* header & description */ }
-        <h2 className='text-6xl font-bold'>Want to build your own website?</h2>
-        <p className='text-2xl text-gray-500 mt-4'>Craft your website with AI and get it done in minutes</p>
+        <h2 className='text-6xl font-bold text-white'>Want to build your own website?</h2>
+        <p className='text-2xl text-gray-300 mt-4'>Craft your website with AI and get it done in minutes</p>
     
         {/* Input box */ }
-        <div className='w-full max-w-2xl border mt-5 p-5 rounded-2xl'>
-            <textarea placeholder='Describe how your dream website should looks like' className='h-24 w-full focus:outline-none focus:ring-0 resize-none' onChange={(e)=>setUserInput(e.target.value)} value={userInput}></textarea>
+        <div className='w-full max-w-2xl border mt-5 p-5 rounded-2xl bg-black'>
+            <textarea placeholder='Describe how your dream website should looks like' className='h-24 w-full focus:outline-none focus:ring-0 resize-none text-white' onChange={(e)=>setUserInput(e.target.value)} value={userInput}></textarea>
             <div className='flex justify-between items-center'>
-                <Button variant={'ghost'} size={'icon-lg'}><ImagePlus/></Button>
+                <Button variant={'default'} size={'icon-lg'}><ImagePlus/></Button>
               {
                 !user?
                 <SignInButton mode='modal' forceRedirectUrl={"/workspace"}>
@@ -97,7 +119,7 @@ function Hero() {
         <div className='w-full max-w-xl mx-auto grid grid-cols-3 gap-3 mt-5 justify-items-center'> 
             {
                 suggestions.map((sug,index)=>(
-                    <Button key={index} variant={'outline'} onClick={()=>setUserInput(sug.prompt)}>
+                    <Button key={index} variant={'default+'} onClick={()=>setUserInput(sug.prompt)}>
                     <sug.icon/>
                     {sug.label}
                     </Button>

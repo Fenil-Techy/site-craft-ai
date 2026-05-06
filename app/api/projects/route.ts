@@ -1,26 +1,37 @@
 import { db } from "@/config/db";
-import { chatTable, frameTable, projectTable } from "@/config/schema";
+import { chatTable, frameTable, projectTable, usersTable } from "@/config/schema";
 import { currentUser } from "@clerk/nextjs/server";
+import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req:NextRequest){
 
-    const{projectId,frameId,messages}=await req.json()
+    const{projectId,frameId,messages,credits}=await req.json()
     const user=await currentUser()
+    const email = user?.primaryEmailAddress?.emailAddress
 
-    const projectResult=await db.insert(projectTable).values({
+    if (!email) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
+
+    await db.insert(projectTable).values({
         projectId:projectId,
-        createdBy:user?.primaryEmailAddress?.emailAddress
+        createdBy:email
     })
-    const frameResult=await db.insert(frameTable).values({
+    await db.insert(frameTable).values({
         projectId:projectId,
         frameId:frameId
     })
-    const chatResult=await db.insert(chatTable).values({
+    await db.insert(chatTable).values({
         chatMessage:messages,
         frameId:frameId,
-        createdBy:user?.primaryEmailAddress?.emailAddress
+        createdBy:email
     })
+   
+    await db.update(usersTable)
+    .set({credits:credits-1})
+    .where(eq(usersTable.email,email))
 
     return NextResponse.json({
         projectId,frameId,messages
