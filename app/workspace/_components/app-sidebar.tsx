@@ -71,17 +71,13 @@ export function AppSidebar() {
                 }`}
             
         >
-            <SidebarHeader className="p-3 flex flex-col">
+            <SidebarHeader className="px-3 py-5 flex flex-col">
                 {open ? (
                     <>
                         <div className="flex gap-2 items-center">
                             <Image src="/logo.png" alt="logo" width={40} height={40} />
-                            <h2 className="font-bold text-xl">AI CraftShip</h2>
+                            <h2 className="font-bold text-xl">AI <span className='text-blue-400'>Craft</span><span className='text-purple-400'>Ship</span></h2>
                         </div>
-
-                        <Button className="mt-4 w-full bg-black text-white">
-                            + Make New Website
-                        </Button>
                     </>
                 ) : (
                     <Image src="/logo.png" alt="logo" width={40} height={40} />
@@ -90,7 +86,7 @@ export function AppSidebar() {
             <SidebarContent className={`p-2 ${open ? 'overflow-y-auto' : ''}`}>
                 {open?
                 <>
-                <SidebarGroupLabel className="font-bold text-xl text-white">Projects</SidebarGroupLabel>
+                <SidebarGroupLabel className="font-medium text-xl text-white">Projects</SidebarGroupLabel>
                 <SidebarGroup >
                     <div>
                         {
@@ -101,9 +97,9 @@ export function AppSidebar() {
                             projectList.length === 0 ?
                             <div className="text-gray-500">No Project Found!</div>
                                     :
-                                    projectList.map((project: any, index) => (
-                                        <Link key={project.id} href={`/playground/${project.projectId}?frameId=${project.frameId}`}>
-                                            <div key={project.id} className=" p-2 hover:rounded-2xl hover:bg-black hover:text-white text-gray-300 ">
+                                    projectList.map((project: any) => (
+                                        <Link key={project.projectId} href={`/playground/${project.projectId}?frameId=${project.frameId}`}>
+                                            <div className=" p-2 hover:rounded-2xl hover:bg-black hover:text-white text-gray-300 ">
                                                 <h2 className="line-clamp-2">
                                                     {project?.chats[0].chatMessage[0].content || "Untitled Project"}
                                                 </h2>
@@ -132,15 +128,11 @@ export function AppSidebar() {
                 {!hasUnlimitedAcess && <div className="p-3 space-y-3 bg-secondary border rounded-2xl">
                     <h2 className="font-bold">Remaining Credits : <span>{!userDetail ? <Loader2Icon className="animate-spin" /> : userDetail.credits}</span></h2>
                     <Progress value={userDetail ? (userDetail?.credits / 2) * 100 : null} />
-                    <Link href={"/workspace/pricing"} className="w-full">
+                    <Link href={"/pricing"} className="w-full">
                         <Button className="w-full p-5 bg-black text-white">Upgrade to Unlimited</Button>
                     </Link>
                 </div>
                 }
-                <div className="flex items-center gap-3">
-                    <UserButton />
-                    <Button variant={'ghost'} >Settings</Button>
-                </div>
                 </>
                 :
                 <div className="flex justify-center items-center">

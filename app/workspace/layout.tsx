@@ -10,12 +10,16 @@ function WorkSpaceLayout({
 }) {
   return (
     <SidebarProvider>
-      <AppSidebar/>
-    <div className='w-full'>
-      <AppHeader/>
-      {children}
-      </div>
-    </SidebarProvider>
+  <AppSidebar />
+
+  <div className="relative w-full overflow-hidden">
+    {/* Background */}
+    <AppHeader />
+   
+
+    {children}
+  </div>
+</SidebarProvider>
   )
 }
 

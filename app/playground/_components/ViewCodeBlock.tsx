@@ -24,7 +24,7 @@ export function ViewCodeBlock({children,code}:any) {
 
   return (
     <Dialog>
-  <DialogTrigger>{children}</DialogTrigger>
+  <DialogTrigger asChild>{children}</DialogTrigger>
   <DialogContent className="min-w-6xl max-h-[500px] overflow-auto">
     <DialogHeader>
       <DialogTitle>

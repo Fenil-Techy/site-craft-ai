@@ -1,8 +1,9 @@
 'use client'
 import React, { useState } from 'react'
 import { Messages } from '../[projectId]/page'
-import { ArrowUp } from 'lucide-react'
+import { ArrowUp, Loader2Icon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Loader } from '@/components/ui/loader'
 
 type Props={
   messages:Messages[],
@@ -33,7 +34,7 @@ function ChatSection({messages,onSend,loading}:Props) {
             (
               messages.map((msg,index)=>(
                 <div key={index} className={` flex ${msg.role==='user'?"justify-end":"justify-start"}`}>
-                    <div className={`p-2 max-w-[80%] rounded-lg ${msg.role==='user'?"bg-gray-100 text-black":"bg-gray-300 text-black"}`}>
+                    <div className={`p-2 max-w-[80%] rounded-lg ${msg.role==='user'?"bg-gray-900 text-gray-200":"bg-gray-300 text-black"}`}>
                       {msg.content}
                     </div>
                 </div>
@@ -41,15 +42,15 @@ function ChatSection({messages,onSend,loading}:Props) {
             )
           }
           {loading&&
-          <div className='flex justify-start items-center p-4'>
-            <div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-zinc-800'></div>
-            <span className='ml-2 text-gray-800'>Thinking...</span>
+          <div className='flex justify-start items-center p-4 gap-2'>
+            <Loader size={28}/>
+            <p>Thinking...</p>
           </div>
           }
         </div>
         <div className=' flex border-t items-center gap-2 p-3 '>
           <textarea className='flex-1 rounded-lg border resize-none px-3 py-2 focus:outline-none focus:ring-2'onChange={(e)=>setInput(e.target.value)} value={input}/>
-          <Button onClick={handleSend}><ArrowUp/></Button>
+          <Button onClick={handleSend}>{loading?<Loader2Icon className='animate-spin'/>:<ArrowUp/>}</Button>
         </div>
     </div>
   )
