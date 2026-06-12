@@ -129,8 +129,8 @@ function ElementSettingSection({ selectedElement, clearSelection }: Props) {
   }
 
   return (
-    <div className='w-96 shadow p-4'>
-      <h2 className='flex gap-2 font-bold items-center'><SwatchBook /> Settings</h2>
+    <div className="w-full p-3 sm:p-4">
+      <h2 className="hidden items-center gap-2 font-bold lg:flex"><SwatchBook /> Settings</h2>
 
       <div className='grid grid-cols-2 gap-3 mt-4'>
         <div className='col-span-2'>

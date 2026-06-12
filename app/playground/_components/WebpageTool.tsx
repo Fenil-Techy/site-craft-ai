@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@/components/ui/button'
-import { Code, Code2Icon, Download, MonitorIcon, PhoneIcon, Smartphone, SquareArrowOutUpRightIcon } from 'lucide-react'
+import { Download, MonitorIcon, Smartphone, SquareArrowOutUpRightIcon, Code2Icon } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { ViewCodeBlock } from './ViewCodeBlock'
 
@@ -77,18 +77,30 @@ function WebpageTool({screenSize,setScreenSize,code}:any) {
 
     }
   return (
-    <div className='w-full p-2 rounded-xl border-2 flex justify-between items-center'>
-        <div className='flex gap-2'>
-            <Button variant={'ghost'} onClick={()=>setScreenSize('desktop')} className={`${screenSize=='desktop'?"border-primary":null}`}><MonitorIcon/></Button>
-            <Button variant={'ghost'} onClick={()=>setScreenSize('mobile')}  className={`${screenSize=='mobile'?"border-primary":null}`}><Smartphone/></Button>
-            
+    <div className="flex w-full flex-col gap-2 rounded-xl border-2 p-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="hidden lg:flex gap-1 sm:gap-2">
+            <Button variant="ghost" size="icon-sm" onClick={() => setScreenSize("desktop")} className={screenSize === "desktop" ? "border border-primary" : undefined} aria-label="Desktop preview">
+              <MonitorIcon />
+            </Button>
+            <Button variant="ghost" size="icon-sm" onClick={() => setScreenSize("mobile")} className={screenSize === "mobile" ? "border border-primary" : undefined} aria-label="Mobile preview">
+              <Smartphone />
+            </Button>
         </div>
-        <div className='flex gap-2'>
-            <Button variant={'outline'} onClick={()=>ViewInNewTab()}>View <SquareArrowOutUpRightIcon/></Button>
+        <div className="flex flex-wrap gap-1.5 sm:gap-2">
+            <Button variant="outline" size="sm" onClick={() => ViewInNewTab()}>
+              View
+              <SquareArrowOutUpRightIcon />
+            </Button>
             <ViewCodeBlock code={finalCode}>
-            <Button>Code<Code2Icon/></Button>
+            <Button size="sm">
+              Code
+              <Code2Icon />
+            </Button>
             </ViewCodeBlock>
-            <Button onClick={downloadButton}>Download<Download/></Button>
+            <Button size="sm" onClick={downloadButton}>
+              Download
+              <Download />
+            </Button>
         </div>
     </div>
   )

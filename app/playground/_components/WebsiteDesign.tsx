@@ -7,6 +7,8 @@ import { OnSaveContext } from '@/context/OnSaveContext';
 import { toast } from 'sonner';
 import { useParams, useSearchParams } from 'next/navigation';
 import axios from 'axios';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 type Props = {
     generatedCode: string
@@ -253,26 +255,67 @@ function WebsiteDesign({ generatedCode }: Props) {
         }
     }
 
-    return (
-        <div className='flex gap-2 w-full'>
-
-        <div className='p-5 w-full flex justify-center items-center flex-col'>
-
-            <iframe
-                ref={iframeRef}
-                className={`${screenSize == 'desktop' ? "w-full" : "w-110"} h-[600px] border-2 rounded-xl`}
-                sandbox="allow-scripts allow-same-origin"
-            />
-            <div className='w-full mt-2 text-sm text-muted-foreground'>
-                Selected: {selectedElementLabel}
-            </div>
-            <WebpageTool screenSize={screenSize} setScreenSize={(v: string) => setScreenSize(v)} code={generatedCode} />
-        </div>
-        {selectedElement?.tagName === "IMG" ? (
+    const settingsPanel =
+        selectedElement?.tagName === "IMG" ? (
             <ImageSettingSection selectedElement={selectedElement as HTMLImageElement} />
         ) : selectedElement ? (
             <ElementSettingSection selectedElement={selectedElement} clearSelection={clearSelectedElement} />
-        ) : null}
+        ) : null;
+
+    return (
+        <div className="relative flex h-full min-h-0 w-full min-w-0 flex-col overflow-hidden lg:flex-row">
+
+            {selectedElement && (
+                <button
+                    type="button"
+                    aria-label="Close settings"
+                    className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+                    onClick={clearSelectedElement}
+                />
+            )}
+
+            {/* Preview + toolbar */}
+            <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
+                <div className="flex min-h-0 flex-1 items-stretch justify-center bg-muted/20 px-3 py-3 sm:px-4 sm:py-4">
+                    <iframe
+                        ref={iframeRef}
+                        className={`h-full w-full min-h-[160px] rounded-xl border-2 bg-white ${
+                          screenSize === "desktop"
+                            ? "max-w-full"
+                            : "mx-auto max-w-full sm:max-w-[360px] md:max-w-[440px]"
+                        }`}
+                        sandbox="allow-scripts allow-same-origin"
+                    />
+                </div>
+
+                <div className="shrink-0 space-y-2 border-t border-border bg-background px-3 py-2 sm:px-4 sm:py-3">
+                    <p className="truncate text-xs text-muted-foreground sm:text-sm">
+                        Selected: {selectedElementLabel}
+                    </p>
+                    <WebpageTool
+                        screenSize={screenSize}
+                        setScreenSize={(v: string) => setScreenSize(v)}
+                        code={generatedCode}
+                    />
+                </div>
+            </div>
+
+            {/* Element settings — bottom sheet on mobile, sidebar on desktop */}
+            {settingsPanel && (
+                <aside className="fixed inset-x-0 bottom-0 z-40 flex max-h-[min(88dvh,720px)] w-full flex-col overflow-hidden rounded-t-2xl border-t border-border bg-background shadow-2xl lg:static lg:z-auto lg:h-full lg:max-h-none lg:w-80 lg:max-w-sm lg:shrink-0 lg:rounded-none lg:border-l lg:shadow-none">
+                    <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3 lg:hidden">
+                        <span className="text-sm font-semibold">
+                            {selectedElement?.tagName === "IMG" ? "Image Settings" : "Element Settings"}
+                        </span>
+                        <Button variant="ghost" size="icon-sm" onClick={clearSelectedElement} aria-label="Close settings">
+                            <X />
+                        </Button>
+                    </div>
+                    <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+                        {settingsPanel}
+                    </div>
+                </aside>
+            )}
         </div>
     );
 }

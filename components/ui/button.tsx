@@ -20,7 +20,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
-        heroButton: "flex gap-2 items-center justify-center text-gray-300 hover:text-white hover:-translate-y-0.5 duration-100 hover:border-gray-500 hover:border-1 hover:rounded-2xl p-1",
+        heroButton: "flex gap-2 items-center justify-center text-gray-300 hover:text-white hover:-translate-y-0.5 duration-100 hover:border-gray-500 hover:border-1 hover:rounded-2xl p-1 ",
       },
       size: {
         default:

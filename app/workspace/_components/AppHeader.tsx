@@ -6,20 +6,24 @@ import React from 'react'
 
 function AppHeader() {
   return (
-  <div className='flex justify-between items-center p-5'>
-    <SidebarTrigger/>
-    <div className='flex gap-3'>
-            <div>
-            <Link href={"/pricing"}>
-            <Button variant={'ghost'} className='text-base text-gray-300 p-3 hover:bg-zinc-800 hover:text-white'>Pricing</Button>
-            </Link>
-            <Link href={"/contact"}>
-            <Button variant={'ghost'} className='text-base text-gray-300 p-3 hover:bg-zinc-800 hover:text-white'>Contact</Button>
-            </Link>
-            </div>
-    <UserButton/>
+  <header className="sticky top-0 z-30 flex items-center justify-between gap-2 border-b border-border/40 bg-background/80 px-3 py-3 backdrop-blur-sm sm:gap-3 sm:px-5 sm:py-4">
+    <SidebarTrigger className="shrink-0" />
+    <div className="flex min-w-0 items-center gap-1 sm:gap-3">
+      <div className="hidden sm:flex">
+        <Link href="/pricing">
+          <Button variant="ghost" className="text-sm text-gray-300 px-3 py-2 hover:bg-zinc-800 hover:text-white sm:text-base sm:p-3">
+            Pricing
+          </Button>
+        </Link>
+        <Link href="/contact">
+          <Button variant="ghost" className="text-sm text-gray-300 px-3 py-2 hover:bg-zinc-800 hover:text-white sm:text-base sm:p-3">
+            Contact
+          </Button>
+        </Link>
+      </div>
+      <UserButton />
     </div>
-  </div>
+  </header>
   )
 }
 

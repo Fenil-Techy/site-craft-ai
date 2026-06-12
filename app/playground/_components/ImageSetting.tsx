@@ -179,8 +179,8 @@ function ImageSettingSection({ selectedElement }: Props) {
     };
 
     return (
-        <div className="w-96 shadow p-4 space-y-4">
-            <h2 className="flex gap-2 items-center font-bold">
+        <div className="w-full space-y-4 p-3 sm:p-4">
+            <h2 className="hidden items-center gap-2 font-bold lg:flex">
                 <ImageIcon /> Image Settings
             </h2>
 

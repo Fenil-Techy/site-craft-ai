@@ -96,41 +96,62 @@ function Hero() {
     return <div className='flex items-center justify-center h-[80vh]'><Loader/></div>
   }
   return (
-    <div className="relative flex flex-col items-center justify-center h-[80vh]">
+    <div className="relative flex flex-col items-center justify-center w-full min-h-[calc(100dvh-4rem)] lg:min-h-[80vh] px-4 sm:px-6 py-8 sm:py-12 text-center">
 
       {/* Background Gradient */}
-      <div className="absolute -top-60 left-1/2 -translate-x-1/2 h-[800px] w-[800px] rounded-full bg-blue-500 opacity-20 blur-3xl -z-10"></div>
+      <div className="absolute -top-32 sm:-top-48 lg:-top-60 left-1/2 -translate-x-1/2 h-[320px] w-[320px] sm:h-[500px] sm:w-[500px] lg:h-[800px] lg:w-[800px] rounded-full bg-blue-500 opacity-20 blur-3xl -z-10 pointer-events-none" />
 
       {/* Bottom left blob */}
-      <div className="absolute bottom-0 left-20 h-[500px] w-[500px] rounded-full bg-purple-500 opacity-20 blur-3xl -z-10"></div>
+      <div className="absolute -bottom-20 -left-20 sm:bottom-0 sm:left-10 lg:left-20 h-[240px] w-[240px] sm:h-[400px] sm:w-[400px] lg:h-[500px] lg:w-[500px] rounded-full bg-purple-500 opacity-20 blur-3xl -z-10 pointer-events-none" />
+
       {/* header & description */}
-      <h2 className='text-6xl font-bold text-white'>Want to build your own website?</h2>
-      <p className='text-2xl text-gray-300 mt-4'>Craft your website with AI and get it done in minutes</p>
+      <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white max-w-3xl">
+        Want to build your <br className="sm:hidden" /> own website?
+      </h2>
+      <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-gray-300 mt-3 sm:mt-4 max-w-xl mx-auto px-1">
+        Craft your website with AI and get it done in minutes
+      </p>
 
       {/* Input box */}
-      <div className='w-full max-w-2xl border mt-5 p-5 rounded-2xl bg-black'>
-        <textarea placeholder='Describe how your dream website should looks like' className='h-24 w-full focus:outline-none focus:ring-0 resize-none text-white' onChange={(e) => setUserInput(e.target.value)} value={userInput}></textarea>
-        <div className='flex justify-between items-center'>
-          <Button variant={'default'} size={'icon-lg'}><ImagePlus /></Button>
-          {
-            !user ?
-              <SignInButton mode='modal' forceRedirectUrl={"/workspace"}>
-                <Button disabled={!userInput}><ArrowUp /></Button>
-              </SignInButton> :
-              <Button disabled={!userInput} onClick={CreateNewProject}>{loading ? <Loader2Icon className='animate-spin' /> : <ArrowUp />}</Button>
-          }
+      <div className="w-full max-w-2xl border mt-5 sm:mt-6 p-4 sm:p-5 rounded-2xl bg-black mx-auto">
+        <textarea
+          placeholder="Describe how your dream website should looks like"
+          className="min-h-20 sm:min-h-24 w-full focus:outline-none focus:ring-0 resize-none text-white text-sm sm:text-base"
+          onChange={(e) => setUserInput(e.target.value)}
+          value={userInput}
+        />
+        <div className="flex justify-between items-center gap-2 mt-2">
+          <Button variant="default" size="icon-lg" className="shrink-0">
+            <ImagePlus />
+          </Button>
+          {!user ? (
+            <SignInButton mode="modal" forceRedirectUrl="/workspace">
+              <Button disabled={!userInput} className="shrink-0">
+                <ArrowUp />
+              </Button>
+            </SignInButton>
+          ) : (
+            <Button disabled={!userInput} onClick={CreateNewProject} className="shrink-0">
+              {loading ? <Loader2Icon className="animate-spin" /> : <ArrowUp />}
+            </Button>
+          )}
         </div>
       </div>
+
       {/* suggestions list */}
-      <div className='w-full max-w-xl mx-auto grid grid-cols-3 gap-3 mt-5 justify-items-center'>
-        {
-          suggestions.map((sug, index) => (
-            <Button key={index} variant={'heroButton'}  onClick={() => setUserInput(sug.prompt)}>
-              <sug.icon />
-              {sug.label}
-            </Button>
-          ))
-        }
+      <div className="w-full max-w-xl mx-auto   grid grid-cols-2 min-[420px]:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mt-5 sm:mt-6">
+        {suggestions.map((sug, index) => (
+          <Button
+            key={index}
+            variant="heroButton"
+            size="xs"
+            className="w-full whitespace-normal text-left sm:text-center justify-center sm:justify-center h-auto min-h-8 py-2"
+            onClick={() => setUserInput(sug.prompt)}
+          >
+            <sug.icon className="shrink-0" />
+            {sug.label}
+          </Button>
+        ))}
       </div>
     </div>
   )

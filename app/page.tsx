@@ -3,9 +3,11 @@ import Hero from "./_components/Hero";
 
 export default function Home() {
   return (
-    <div className="flex flex-col justify-center items-center">
+    <div className="flex min-h-screen flex-col overflow-x-hidden">
       <Header />
-      <Hero/>
+      <main className="flex flex-1 flex-col">
+        <Hero />
+      </main>
     </div>
   );
 }

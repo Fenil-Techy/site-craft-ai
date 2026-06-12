@@ -1,14 +1,14 @@
 'use client'
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { SignInButton, UserButton, useUser } from '@clerk/nextjs';
-import { ArrowRightIcon } from 'lucide-react';
+import { ArrowRightIcon, Menu } from 'lucide-react';
 import Image from 'next/image'
 import Link from 'next/link';
 
 
 function Header() {
-  
-  const{user}=useUser()
+  const { user } = useUser()
 
   const menu = [
     {
@@ -24,37 +24,71 @@ function Header() {
       href: '/contact'
     }
   ];
+
   return (
-    <div className='flex justify-between items-center p-4 shadow w-[80%]'>
+    <header className="sticky top-0 z-40 w-full shadow bg-background/80 backdrop-blur-sm">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:w-[90%] xl:w-[80%]">
 
-      {/* logo & name */}
+        {/* logo & name */}
+        <Link href="/" className="flex min-w-0 items-center gap-2">
+          <Image
+            src="/logo.png"
+            alt="logo"
+            width={50}
+            height={50}
+            className="h-7 w-7 shrink-0 sm:h-9 sm:w-9 lg:h-12 lg:w-12"
+          />
+          <h2 className="truncate text-sm font-bold text-white sm:text-base md:text-xl lg:text-2xl">
+            AI <span className="text-blue-400">Craft</span><span className="text-purple-400">Ship</span>
+          </h2>
+        </Link>
 
-      <div className='flex gap-2 items-center'>
-        <Image src="/logo.png" alt="logo" width={50} height={50} />
-        <h2 className='text-2xl font-bold text-white'>AI <span className='text-blue-400'>Craft</span><span className='text-purple-400'>Ship</span></h2>
-      </div>
-
-      {/* menu options */}
-
-      <div className='flex gap-3'>
-        {
-          menu.map((item, index) => (
-            <Link key={index} href={item.href}>
-            <Button variant={'ghost'} className='text-base text-gray-300 p-4 hover:bg-zinc-800 hover:text-white'>{item.name}</Button>
+        {/* desktop menu */}
+        <nav className="hidden lg:flex gap-1 xl:gap-3">
+          {menu.map((item) => (
+            <Link key={item.href} href={item.href}>
+              <Button variant="ghost" className="text-base text-gray-300 px-4 py-4 hover:bg-zinc-800 hover:text-white">
+                {item.name}
+              </Button>
             </Link>
-          ))
-        }
-      </div>
+          ))}
+        </nav>
 
-      {/* CTA button */}
+        {/* CTA + mobile menu */}
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {user ? (
+            <UserButton />
+          ) : (
+            <SignInButton mode="modal">
+              <Button size="xs">
+                <span className="hidden sm:inline">Get Started </span>
+                <ArrowRightIcon className="size-3 sm:ml-0" />
+              </Button>
+            </SignInButton>
+          )}
 
-      <div>
-        {user?<UserButton/>:
-        <SignInButton mode="modal"><Button>Get Started <ArrowRightIcon size={10} /></Button></SignInButton>  
-        }
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon-sm" className="lg:hidden" aria-label="Open menu">
+                <Menu />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[min(100vw-2rem,320px)]">
+              <SheetTitle className="sr-only">Navigation menu</SheetTitle>
+              <nav className="mt-8 flex flex-col gap-2">
+                {menu.map((item) => (
+                  <Link key={item.href} href={item.href}>
+                    <Button variant="ghost" className="h-11 w-full justify-start text-base text-gray-300 hover:bg-zinc-800 hover:text-white">
+                      {item.name}
+                    </Button>
+                  </Link>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
-
-    </div>
+      </div>
+    </header>
   )
 }
 

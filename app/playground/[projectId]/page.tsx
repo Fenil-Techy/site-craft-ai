@@ -9,6 +9,7 @@ import { useParams, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
+import { Sparkles } from 'lucide-react'
 
 export type Messages={
   role:string,
@@ -131,6 +132,7 @@ Do not output anything before the mode marker.
 `;
 
 function Playground() {
+  const [chatOpen, setChatOpen] = useState(false);
     const{projectId}=useParams()
     const params=useSearchParams()
     const frameId=params.get('frameId')
@@ -306,13 +308,82 @@ function Playground() {
     }
 
   return (
-    <div>
-        <PlaygroundHeader/>
-        <div className='flex'>
-        <ChatSection messages={messages ?? []} onSend={(input:string)=>SendMessage(input)} loading={loading}/>
-        <WebsiteDesign generatedCode={generatedCode}/>
-        
-        </div>
+    <div className="flex h-dvh flex-col overflow-hidden bg-background">
+      <PlaygroundHeader />
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
+        {/* Desktop */}
+<div className="hidden lg:flex">
+  <ChatSection
+    messages={messages ?? []}
+    onSend={(input: string) => SendMessage(input)}
+    loading={loading}
+  />
+</div>
+
+{/* Mobile Floating Widget */}
+<div className="lg:hidden">
+  {!chatOpen && (
+    <button
+      onClick={() => setChatOpen(true)}
+      className="
+      fixed bottom-6 right-6
+      z-50
+      flex h-16 w-16 items-center justify-center
+      rounded-full
+      bg-black
+      border-white
+      border
+      shadow-2xl
+      transition
+      hover:scale-110
+      active:scale-95
+      "
+      ><Sparkles size={24}/>
+  </button>
+    
+  )}
+
+{chatOpen && (
+  <>
+    {/* Backdrop */}
+    <div
+      className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
+      onClick={() => setChatOpen(false)} // optional: close on outside click
+    />
+
+    {/* Chat Widget */}
+    <div className="
+fixed bottom-6 right-4 z-50
+flex h-[80dvh] w-[92vw] max-w-md flex-col
+overflow-hidden rounded-3xl
+border border-white/10
+bg-zinc-900/95
+backdrop-blur-xl
+shadow-[0_20px_80px_rgba(0,0,0,0.45)]
+">
+      <div className="flex shrink-0 items-center justify-between border-b p-3">
+        <h2 className="font-semibold">Chat Section</h2>
+
+        <button onClick={() => setChatOpen(false)}>
+          ✕
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-hidden">
+        <ChatSection
+          messages={messages ?? []}
+          onSend={(input: string) => SendMessage(input)}
+          loading={loading}
+        />
+      </div>
+    </div>
+  </>
+)}
+</div>
+        <main className="relative order-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden lg:order-2 lg:h-full">
+          <WebsiteDesign generatedCode={generatedCode} />
+        </main>
+      </div>
     </div>
   )
 }
