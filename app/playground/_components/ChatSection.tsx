@@ -24,8 +24,8 @@ function ChatSection({messages,onSend,loading}:Props) {
   }
 
   return (
-    <div className="flex h-full w-full min-h-0 flex-col border-t border-border p-3 shadow sm:p-4 lg:h-full lg:w-80 lg:min-w-72 lg:max-w-96 lg:border-r lg:border-t-0 xl:w-96">
-        <div className="flex min-h-0 flex-1 flex-col space-y-3 overflow-y-auto p-1 sm:p-2">
+    <div className="flex h-full w-full min-h-0 flex-col border-t border-border  shadow  lg:h-full lg:w-96 lg:min-w-72 lg:max-w-120 lg:border-r lg:border-t-0 xl:w-120">
+        <div className="flex min-h-0 flex-1 flex-col space-y-3 overflow-y-auto p-1 sm:p-2 lg:p-5">
           {
             messages.length==0?
             (
@@ -34,7 +34,7 @@ function ChatSection({messages,onSend,loading}:Props) {
             (
               messages.map((msg,index)=>(
                 <div key={index} className={`flex ${msg.role==='user'?"justify-end":"justify-start"}`}>
-                    <div className={`max-w-[85%] rounded-lg p-2 text-sm sm:text-base wrap-break-word ${msg.role==='user'?"bg-gray-900 text-gray-200":"bg-gray-300 text-black"}`}>
+                    <div className={`rounded-lg p-3 font-normal text-sm sm:text-base wrap-break-word ${msg.role==='user'?"bg-zinc-800 max-w-[85%]  text-gray-200":" text-white w-full"}`}>
                       {msg.content}
                     </div>
                 </div>

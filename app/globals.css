@@ -119,6 +119,7 @@
 }
 
 @layer base {
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -128,4 +129,28 @@
   html {
     @apply font-sans;
   }
+}
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(82 82 91); /* zinc-600 */
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(113 113 122); /* zinc-500 */
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(82 82 91) transparent;
 }

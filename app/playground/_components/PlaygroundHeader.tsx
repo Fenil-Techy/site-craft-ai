@@ -1,29 +1,186 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from '@/components/ui/button'
 import { OnSaveContext } from '@/context/OnSaveContext'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useContext } from 'react'
+import { useContext, useEffect, useMemo, useState } from 'react'
+import { Download, MonitorIcon, Smartphone, SquareArrowOutUpRightIcon, Code2Icon, Save } from 'lucide-react'
+import { ViewCodeBlock } from './ViewCodeBlock'
 
-function PlaygroundHeader() {
-  const{onSave,setOnSave}=useContext(OnSaveContext)
+const HTML_CODE=`<!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <meta name="description" content="AI Website Builder - Modern TailwindCSS + Flowbite Template">
+          <title>AI Website Builder</title>
+
+          <!-- Tailwind CSS -->
+          <script src="https://cdn.tailwindcss.com"></script>
+
+          <!-- Flowbite CSS & JS -->
+          <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet">
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+          <!-- Font Awesome / Lucide -->
+          <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+          <!-- Chart.js -->
+          <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+          <!-- AOS -->
+          <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+
+          <!-- GSAP -->
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+          <!-- Lottie -->
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.11.2/lottie.min.js"></script>
+
+          <!-- Swiper -->
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css" />
+          <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js"></script>
+
+          <!-- Tippy.js -->
+          <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+          <script src="https://unpkg.com/@popperjs/core@2"></script>
+          <script src="https://unpkg.com/tippy.js@6"></script>
+      </head>
+      
+{code}
+
+      </html>`
+function PlaygroundHeader({screenSize,setScreenSize,code}:any) {
+const{onSave,setOnSave}=useContext(OnSaveContext)
+const[finalCode,setFinalCode]=useState<string>("")
+useEffect(()=>{
+    const cleanCode=(HTML_CODE.replace('{code}',code)||"").replaceAll("```html",'').replace("```",'').replace('html','')
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFinalCode(cleanCode)
+},[code])
+    const ViewInNewTab=()=>{
+        if(!finalCode) return 
+
+        
+        const blob=new Blob([finalCode||""],{type:"text/html"})
+        const url=URL.createObjectURL(blob)
+        window.open(url,"_blank")
+    }
+    const downloadButton=()=>{
+        const blob=new Blob([finalCode||""],{type:"text/html"})
+        const url=URL.createObjectURL(blob)
+        const a=document.createElement('a')
+        a.href=url;
+        a.download='index.html';
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+
+    }
   return (
-    <header className="flex shrink-0 items-center justify-between gap-2 border-b border-border/40 px-3 py-3 shadow sm:gap-3 sm:px-4 sm:py-4">
-      <Link href="/workspace" className="min-w-0">
-      <div className="flex items-center gap-2">
-        <Image src="/logo.png" alt="logo" width={50} height={50} className="h-8 w-8 shrink-0 sm:h-10 sm:w-10" />
-        <h2 className="truncate text-base font-bold text-white sm:text-xl lg:text-2xl">
-          AI <span className="text-blue-400">Craft</span><span className="text-purple-400">Ship</span>
-        </h2>
-      </div>
-      </Link>
-      <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-        <Link href="/workspace">
-        <Button size="sm" className="hidden sm:inline-flex">Make new project +</Button>
-        <Button size="sm" className="sm:hidden">New +</Button>
-        </Link>
-        <Button size="sm" onClick={() => setOnSave(Date.now())}>Save</Button>
-      </div>
-    </header>
+    <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background/90 backdrop-blur-md px-2 sm:px-4">
+
+  {/* Logo */}
+  <Link href="/workspace">
+    <div className="flex items-center gap-2">
+      <Image
+        src="/logo.png"
+        alt="logo"
+        width={40}
+        height={40}
+        className="h-8 w-8"
+      />
+
+      <h2 className="hidden md:block text-lg font-bold">
+        AI
+        <span className="text-blue-400">Craft</span>
+        <span className="text-purple-400">Ship</span>
+      </h2>
+    </div>
+  </Link>
+
+  {/* Actions */}
+  <div className="flex items-center gap-3 overflow-x-auto">
+
+    {/* Desktop / Mobile */}
+    <div className="hidden lg:flex items-center rounded-md border p-1">
+    <Button variant="ghost" size="icon-sm" onClick={() => setScreenSize("desktop")} className={screenSize === "desktop" ? "border border-primary" : undefined} aria-label="Desktop preview">
+              <MonitorIcon />
+            </Button>
+            <Button variant="ghost" size="icon-sm" onClick={() => setScreenSize("mobile")} className={screenSize === "mobile" ? "border border-primary" : undefined} aria-label="Mobile preview">
+              <Smartphone />
+            </Button>
+    </div>
+
+    <Button
+  size="icon"
+  variant="outline"
+  className="sm:hidden"
+  onClick={ViewInNewTab}
+>
+  <SquareArrowOutUpRightIcon className="h-4 w-4" />
+</Button>
+
+<Button
+  size="sm"
+  variant="outline"
+  className="hidden sm:flex"
+  onClick={ViewInNewTab}
+>
+  <SquareArrowOutUpRightIcon className="h-4 w-4" />
+  View
+</Button>
+<ViewCodeBlock code={finalCode}>
+    <div>
+    <Button size="icon" className="sm:hidden">
+      <Code2Icon className="h-4 w-4" />
+    </Button>
+
+    <Button size="sm" className="hidden sm:flex">
+      <Code2Icon className="h-4 w-4" />
+      Code
+    </Button>
+    </div>
+</ViewCodeBlock>
+
+<Button
+  size="icon"
+  className="sm:hidden"
+  onClick={downloadButton}
+>
+  <Download className="h-4 w-4" />
+</Button>
+
+<Button
+  size="sm"
+  className="hidden sm:flex"
+  onClick={downloadButton}
+>
+  <Download className="h-4 w-4" />
+  Download
+</Button>
+
+<Button
+  size="icon"
+  className="sm:hidden"
+  onClick={() => setOnSave(Date.now())}
+>
+  <Save className="h-4 w-4" />
+</Button>
+
+<Button
+  size="sm"
+  className="hidden sm:flex"
+  onClick={() => setOnSave(Date.now())}
+>
+  <Save className="h-4 w-4" />
+  Save
+</Button>
+   
+  </div>
+</header>
   )
 }
 

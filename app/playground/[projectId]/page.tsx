@@ -139,6 +139,7 @@ function Playground() {
     const [frameDetail,setFrameDetail]=useState<Frame>()
     const[loading,setLoading]=useState(false)
     const[generatedCode,setGeneratedCode]=useState<string>("")
+    const [screenSize, setScreenSize] = useState("desktop");
 
     const [messages,setMessages]=useState<Messages[]>()
 
@@ -309,7 +310,9 @@ function Playground() {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background">
-      <PlaygroundHeader />
+      <PlaygroundHeader screenSize={screenSize}
+                        setScreenSize={(v: string) => setScreenSize(v)}
+                        code={generatedCode}/>
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
         {/* Desktop */}
 <div className="hidden lg:flex">
@@ -381,7 +384,7 @@ shadow-[0_20px_80px_rgba(0,0,0,0.45)]
 )}
 </div>
         <main className="relative order-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden lg:order-2 lg:h-full">
-          <WebsiteDesign generatedCode={generatedCode} />
+          <WebsiteDesign generatedCode={generatedCode} screenSize={screenSize}/>
         </main>
       </div>
     </div>

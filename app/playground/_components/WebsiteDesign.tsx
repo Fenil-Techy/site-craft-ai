@@ -11,7 +11,8 @@ import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 
 type Props = {
-    generatedCode: string
+    generatedCode: string,
+    screenSize: string
 }
 
 const HTML_CODE = `
@@ -43,9 +44,9 @@ const HTML_CODE = `
       </html>
     `
 
-function WebsiteDesign({ generatedCode }: Props) {
+function WebsiteDesign({ generatedCode ,screenSize }: Props) {
 
-    const [screenSize, setScreenSize] = useState('desktop')
+    
     const [selectedElementLabel, setSelectedElementLabel] = useState<string>("No component selected")
     const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null)
     const{onSave,setOnSave}=useContext(OnSaveContext)
@@ -276,10 +277,10 @@ function WebsiteDesign({ generatedCode }: Props) {
 
             {/* Preview + toolbar */}
             <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
-                <div className="flex min-h-0 flex-1 items-stretch justify-center bg-muted/20 px-3 py-3 sm:px-4 sm:py-4">
+                <div className="flex min-h-0 flex-1 items-stretch justify-center bg-muted/20 p-3 sm:px-4 sm:py-4">
                     <iframe
                         ref={iframeRef}
-                        className={`h-full w-full min-h-[160px] rounded-xl border-2 bg-white ${
+                        className={`h-full w-full min-h-[160px] rounded-xl ${
                           screenSize === "desktop"
                             ? "max-w-full"
                             : "mx-auto max-w-full sm:max-w-[360px] md:max-w-[440px]"
@@ -288,7 +289,7 @@ function WebsiteDesign({ generatedCode }: Props) {
                     />
                 </div>
 
-                <div className="shrink-0 space-y-2 border-t border-border bg-background px-3 py-2 sm:px-4 sm:py-3">
+                {/* <div className="shrink-0 space-y-2 border-t border-border bg-background px-3 py-2 sm:px-4 sm:py-3">
                     <p className="truncate text-xs text-muted-foreground sm:text-sm">
                         Selected: {selectedElementLabel}
                     </p>
@@ -297,7 +298,7 @@ function WebsiteDesign({ generatedCode }: Props) {
                         setScreenSize={(v: string) => setScreenSize(v)}
                         code={generatedCode}
                     />
-                </div>
+                </div> */}
             </div>
 
             {/* Element settings — bottom sheet on mobile, sidebar on desktop */}
