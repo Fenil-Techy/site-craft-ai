@@ -62,11 +62,6 @@ function Hero() {
       console.log(result.data)
       toast.success('Project created')
       router.push(`/playground/${projectId}?frameId=${frameId}`)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setUserDetail((prev: any) => ({
-        ...prev,
-        credits: prev?.credits - 1
-      }))
       setLoading(false)
     } catch (error) {
       toast.error("Internal server error")
