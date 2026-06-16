@@ -52,13 +52,14 @@ const HTML_CODE=`<!DOCTYPE html>
 
       </html>`
 function PlaygroundHeader({screenSize,setScreenSize,code}:any) {
+  console.log("Header render");
 const{onSave,setOnSave}=useContext(OnSaveContext)
-const[finalCode,setFinalCode]=useState<string>("")
-useEffect(()=>{
-    const cleanCode=(HTML_CODE.replace('{code}',code)||"").replaceAll("```html",'').replace("```",'').replace('html','')
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setFinalCode(cleanCode)
-},[code])
+const finalCode = useMemo(() => {
+  return (HTML_CODE.replace("{code}", code) || "")
+    .replaceAll("```html", "")
+    .replace("```", "")
+    .replace("html", "");
+}, [code]);
     const ViewInNewTab=()=>{
         if(!finalCode) return 
 
