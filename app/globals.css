@@ -154,3 +154,27 @@
   scrollbar-width: thin;
   scrollbar-color: rgb(82 82 91) transparent;
 }
+
+:root {
+  --clerk-color-primary: #7C5CFF;
+  --clerk-color-primary-foreground: #FFFFFF;
+
+  --clerk-color-danger: #EF4444;
+  --clerk-color-success: #22C55E;
+  --clerk-color-warning: #F59E0B;
+
+  --clerk-color-background: #09090B;
+  --clerk-color-foreground: #FAFAFC;
+  --clerk-color-neutral: #18181B;
+
+  --clerk-color-input: #1A1A24;
+  --clerk-color-input-foreground: #FFFFFF;
+
+  --clerk-color-ring: rgba(124, 92, 255, 0.3);
+
+  --clerk-color-shimmer: #FFFFFF;
+  --clerk-color-modal-backdrop: rgba(0, 0, 0, 0.75);
+
+  --clerk-border-radius: 0.75rem;
+  --clerk-spacing: 1rem;
+}
