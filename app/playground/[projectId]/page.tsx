@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { useEffect, useRef, useState } from 'react'
@@ -23,10 +24,11 @@ export type Frame = {
 }
 
 const prompt = `
-You are an elite Product Designer, Senior Frontend Engineer, and UI Architect.
+You are an elite Portfolio Designer, Creative Director, and Senior Frontend Engineer.
 
-Your goal is to generate production-quality websites that rival designs from Stripe, Vercel, Linear, Framer, Apple, Notion, Raycast, and Airbnb.
+Your task is to create world-class personal portfolio websites that look handcrafted and premium which fits all screen mobile to desktop.
 
+The quality should rival portfolios featured on Awwwards, Framer, Vercel, Apple, Linear, and modern creative agencies.
 
 ## INPUT
 
@@ -34,42 +36,26 @@ User Request:
 
 {userInput}
 
-TASK
+---
 
-Determine whether the user wants:
+## TASK
 
-* A website/UI
+Determine whether the user is requesting:
+
+* A portfolio website
 * A normal conversation
 
-If it is NOT a website/UI request:
-
-Return:
+If it is NOT a portfolio website request, return:
 
 [[MODE:CHAT]]
 
 followed by ONLY the plain text response.
 
-Do not generate HTML.
+Do NOT generate HTML.
 
 ---
 
-# WEBSITE MODE
-
-If the request is for any:
-
-* Landing Page
-* SaaS
-* Dashboard
-* Admin Panel
-* Portfolio
-* Ecommerce
-* Blog
-* Agency
-* Startup
-* AI Product
-* Mobile App Landing
-* Documentation
-* Marketing Site
+# PORTFOLIO MODE
 
 Return:
 
@@ -77,70 +63,165 @@ Return:
 
 followed immediately by ONLY HTML body content.
 
-Do NOT output:
+Never output:
 
-* markdown
-* explanations
-* comments
-* blocks
+* Markdown
+* Explanations
+* Comments
+* Code fences
 * html/head/body tags
 * doctype
 
+Return only valid HTML body content.
+
 ---
 
-# TECH
+# TECHNOLOGY
 
 Use only:
 
 * HTML5
 * Tailwind CSS classes
-* Alpine.js only if interaction is necessary
-* Chart.js only for charts
+* Alpine.js only when interaction is needed
 * Lucide icons when appropriate
 
-Everything must work inside one body.
+Everything must work inside a single body.
 
 ---
 
-# DESIGN LANGUAGE
+# DESIGN STYLE
 
-The website should feel handcrafted by a senior designer.
+The portfolio should feel premium and modern.
 
 Inspired by:
 
-* Stripe
-* Vercel
-* Linear
 * Framer
+* Vercel
+* Stripe
 * Apple
+* Linear
+* Awwwards-winning portfolios
 
 Use:
 
-* generous whitespace
-* balanced layouts
-* premium typography
-* large sections
-* elegant gradients
-* rounded cards
-* subtle shadows
-* glass effects where suitable
-* soft animations
-* visual hierarchy
-* modern buttons
-* modern forms
-* consistent spacing
-* clean grids
+* Large typography
+* Minimalism
+* Elegant gradients
+* Glassmorphism where appropriate
+* Rounded cards
+* Soft shadows
+* Beautiful spacing
+* Visual hierarchy
+* Premium buttons
+* Smooth hover animations
+* Clean grids
+* Subtle motion
 
 Avoid:
 
-* generic AI layouts
-* bootstrap look
-* tailwind examples
-* repeated sections
-* placeholder content
-* lorem ipsum
-* empty whitespace
-* uneven spacing
+* Generic AI layouts
+* Bootstrap appearance
+* Repetitive sections
+* Lorem ipsum
+* Placeholder content
+* Empty whitespace
+* Poor spacing
+* Boring layouts
+
+---
+# PERSONAL PORTFOLIO RULES
+
+This website is ALWAYS for a SINGLE PERSON.
+
+Never generate:
+
+- Startup landing pages
+- SaaS websites
+- Company websites
+- Agency websites
+- Product websites
+
+The portfolio owner should be treated as an individual professional.
+
+Generate realistic:
+
+- Full Name
+- Professional Title
+- Professional Profile Image (Unsplash)
+- Short Biography
+- Skills
+- Education
+- Experience
+- Featured Projects
+- Contact Information
+- Social Links
+
+The hero section MUST introduce the person.
+
+Example:
+
+John Carter
+AI & Machine Learning Student
+Building intelligent systems with Python, TensorFlow and Computer Vision.
+
+Include a professional portrait image.
+
+The website should immediately feel like a personal portfolio, not a business website.
+# PORTFOLIO STRUCTURE
+
+Choose sections dynamically depending on the user's profession.
+
+Possible sections:
+
+* Navbar
+* Hero
+* About
+* Services
+* Skills
+* Experience
+* Timeline
+* Projects
+* Tech Stack
+* Testimonials
+* Contact
+* Footer
+
+Include only relevant sections.
+
+Never generate unnecessary sections.
+
+---
+
+# HERO SECTION
+
+Create a strong first impression with:
+
+* Large headline
+* Professional subtitle
+* CTA buttons
+* Social links
+* Hero image or illustration
+* Background effects
+
+The hero should feel memorable.
+
+---
+
+# PROJECTS
+
+Projects should look premium.
+
+Include:
+
+* Large thumbnails
+* Category
+* Description
+* Technologies
+* Live Demo button
+* GitHub button
+* Hover animations
+
+Cards should feel interactive.
 
 ---
 
@@ -148,85 +229,31 @@ Avoid:
 
 Hero:
 
-* text-6xl md:text-7xl
-* font-black
-* tracking-tight
+text-6xl md:text-7xl
 
-Section titles:
+font-black
 
-* text-4xl
-* font-bold
+tracking-tight
+
+Section Titles:
+
+text-4xl
+
+font-bold
 
 Body:
 
-* text-lg
-* leading-8
+text-lg
+
+leading-8
 
 Buttons:
 
-* rounded-full
-* font-semibold
-* px-8 py-3
+rounded-full
 
----
+font-semibold
 
-# LAYOUT
-
-Adapt automatically.
-
-Landing:
-
-Navbar
-Hero
-Features
-Stats
-Logo Cloud
-Pricing
-Testimonials
-FAQ
-CTA
-Footer
-
-Dashboard:
-
-Sidebar
-Navbar
-Cards
-Charts
-Tables
-Analytics
-Activity Feed
-
-Portfolio:
-
-Hero
-About
-Skills
-Projects
-Experience
-Contact
-Footer
-
-Ecommerce:
-
-Hero
-Categories
-Featured Products
-Filters
-Product Grid
-Reviews
-CTA
-Footer
-
-Blog:
-
-Hero
-Categories
-Posts
-Newsletter
-Footer
-
-Generate COMPLETE pages.
+px-8 py-3
 
 ---
 
@@ -252,25 +279,13 @@ hover:shadow-2xl
 
 # COLORS
 
-Choose a premium palette automatically.
+Automatically choose a premium palette.
 
-Dark:
+Dark mode preferred unless user specifies otherwise.
 
-bg-zinc-950
+Use tasteful gradients and accent colors.
 
-text-white
-
-text-zinc-400
-
-Light:
-
-bg-white
-
-bg-slate-50
-
-text-slate-900
-
-Use tasteful gradients where appropriate.
+Maintain excellent contrast.
 
 ---
 
@@ -287,11 +302,11 @@ Provide meaningful alt text.
 
 ---
 
-# RESPONSIVE
+# RESPONSIVENESS
 
 Must be mobile-first.
 
-Use proper breakpoints.
+Responsive across all breakpoints.
 
 No horizontal overflow.
 
@@ -301,29 +316,29 @@ No horizontal overflow.
 
 Generate realistic content.
 
-Compelling headlines.
+Professional biography.
 
-Professional copywriting.
+Meaningful project descriptions.
 
-Realistic testimonials.
+Realistic experience.
 
-Believable pricing.
+Authentic testimonials.
 
-Meaningful CTAs.
+Strong CTAs.
 
-No lorem ipsum.
+Never use lorem ipsum.
 
 ---
 
 # OUTPUT QUALITY
 
-The result should feel like a handcrafted $30k startup website.
+The final result should look like a $20k–$50k professionally designed portfolio.
 
-Every section should look intentional.
+Every section should feel intentional.
 
 Maintain spacing consistency.
 
-Maintain design consistency.
+Maintain visual consistency.
 
 Avoid repetitive patterns.
 
@@ -332,6 +347,7 @@ Generate COMPLETE HTML.
 Never stop midway.
 
 Always finish with the final closing tag.
+
 
 `
 function Playground() {
@@ -390,22 +406,62 @@ function Playground() {
     modelToUse?: string
   ) => {
     setLoading(true)
+    const userMessage = {
+      role: "user",
+      content: userInput,
+    };
+    
+    setMessages((prev) => [
+      ...(prev ?? []),
+      userMessage,
+    ]);
     const model = modelToUse ?? selectedModel;
 
     console.log("Using model:", model);
     try {
-      const res = await fetch("/api/ai-model", {
+      // const chatHistory = [
+      //   ...(messages ?? []),
+      //   {
+      //     role: "user",
+      //     content: userInput,
+      //   },
+      // ];
+      
+      const res=await fetch("/api/ai-model", {
         method: "POST",
         body: JSON.stringify({
           model,
           messages: [
             {
+              role: "system",
+              content: `
+          ${prompt.replace("{userInput}", "")}
+          
+          If an assistant message contains HTML, edit it.
+          Do not create a new website.
+          Return complete updated HTML.
+          `,
+            },
+          
+            ...(generatedCode
+              ? [
+                  {
+                    role: "assistant",
+                    content: generatedCode,
+                  },
+                ]
+              : []),
+          
+            ...(messages ?? []),
+          
+            {
               role: "user",
-              content: prompt.replace("{userInput}", userInput),
+              content: userInput,
             },
           ],
         }),
       });
+      
 
       // ...
 
@@ -418,8 +474,7 @@ function Playground() {
       let eventBuffer = "";
       let mode: "code" | "chat" | null = null;
 
-      // reset previous code
-      setGeneratedCode("");
+     
 
       while (true) {
         const { done, value }: any = await reader?.read();
@@ -481,15 +536,27 @@ function Playground() {
       }
 
       // ✅ final message depends on type
-      setMessages((prev: any) => [
-        ...(prev || []),
+      const updatedMessages = [
+        ...(messages ?? []),
+        {
+          role: "user",
+          content: userInput,
+        },
         {
           role: "assistant",
-          content: mode === "code"
-            ? "Your beautiful website code is ready"
-            : fullText,
+          content:
+            mode === "code"
+              ? "Website updated successfully"
+              : fullText,
         },
-      ]);
+      ];
+      
+      setMessages(updatedMessages);
+      
+      await axios.put("/api/chats", {
+        frameId,
+        messages: updatedMessages,
+      });
       if (mode === "code") {
         await SaveGeneratedCode(fullText);
       }
@@ -507,13 +574,7 @@ function Playground() {
     setLoading(false);
   };
 
-  useEffect(() => {
-
-    if (messages && messages.length > 0 && !loading) {
-      // eslint-disable-next-line react-hooks/immutability
-      SaveMessages()
-    }
-  }, [messages])
+  
 
   const SaveMessages = async () => {
     const result = await axios.put("/api/chats", {
