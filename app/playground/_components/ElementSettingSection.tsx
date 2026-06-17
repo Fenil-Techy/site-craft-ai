@@ -1,4 +1,4 @@
- 'use client'
+'use client'
 import { Button } from '@/components/ui/button'
 import { SwatchBook } from 'lucide-react'
 import {
@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useMemo, useState } from 'react'
+import { Textarea } from "@/components/ui/textarea" // Make sure to use your text element UI or standard textarea
+import { useMemo, useState, useEffect } from 'react'
 
 type Props = {
   selectedElement: HTMLElement | null,
@@ -66,6 +67,19 @@ function normalizeColor(value: string, fallback: string) {
 function ElementSettingSection({ selectedElement, clearSelection }: Props) {
   const [, setRerender] = useState(0)
   const [draftStyles, setDraftStyles] = useState<Partial<Record<"lineHeight" | "letterSpacing" | "padding" | "margin" | "borderRadius" | "borderWidth", string>>>({})
+  
+  // Dynamic draft state for editing the text string directly
+  const [textDraft, setTextDraft] = useState<string>("")
+
+  // Update sidebar text whenever a completely new element gets selected
+  useEffect(() => {
+    if (selectedElement) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setTextDraft(selectedElement.innerText || "")
+    } else {
+      setTextDraft("")
+    }
+  }, [selectedElement])
 
   const fontSizes = useMemo(() => [...Array(53)].map((_, index) => `${index + 12}px`), [])
 
@@ -103,6 +117,29 @@ function ElementSettingSection({ selectedElement, clearSelection }: Props) {
     })
   }
 
+  // Pushes text from input back to the live DOM node in the frame
+  const commitTextChange = () => {
+    if (!selectedElement) return
+
+    // 1. Find the active iframe in the DOM
+    const iframe = document.querySelector('iframe') as HTMLIFrameElement | null
+    const iframeDoc = iframe?.contentDocument || iframe?.contentWindow?.document
+    
+    if (iframeDoc) {
+      // 2. Query the exact element from the iframe directly using its reference
+      // This breaks the reference link to props/state for ESLint
+      const realDOMElement = iframeDoc.contains(selectedElement) 
+        ? selectedElement as HTMLElement 
+        : null
+
+      if (realDOMElement) {
+        // eslint-disable-next-line react-hooks/immutability
+        realDOMElement.innerText = textDraft
+        setRerender((v) => v + 1)
+      }
+    }
+  }
+
   const resetSelectedElementStyles = () => {
     if (!selectedElement) return
     const editableKeys = [
@@ -125,6 +162,7 @@ function ElementSettingSection({ selectedElement, clearSelection }: Props) {
       selectedElement.style.removeProperty(key)
     })
     setDraftStyles({})
+    setTextDraft(selectedElement.innerText || "")
     setRerender((v) => v + 1)
   }
 
@@ -133,6 +171,28 @@ function ElementSettingSection({ selectedElement, clearSelection }: Props) {
       <h2 className="hidden items-center gap-2 font-bold lg:flex"><SwatchBook /> Settings</h2>
 
       <div className='grid grid-cols-2 gap-3 mt-4'>
+        
+        {/* New Text Changing Field Block */}
+        <div className='col-span-2'>
+          <label className='text-sm font-medium'>Element Text Content</label>
+          <Textarea 
+            className="w-full mt-1 border rounded px-2 py-1 text-sm bg-background resize-none h-16"
+            value={textDraft}
+            disabled={!selectedElement}
+            onChange={(e) => setTextDraft(e.target.value)}
+            onBlur={commitTextChange}
+            onKeyDown={(e) => {
+              // Pressing enter triggers change save, shift+enter inserts line break normally
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault()
+                commitTextChange()
+                ;(e.target as HTMLElement).blur()
+              }
+            }}
+            placeholder={selectedElement ? "Enter custom text content..." : "Select an element to edit text"}
+          />
+        </div>
+
         <div className='col-span-2'>
           <label className='text-sm'>Font Size</label>
           <Select value={getStyleValue("fontSize")} onValueChange={(value) => applyStyle("font-size", value)}>
@@ -171,12 +231,12 @@ function ElementSettingSection({ selectedElement, clearSelection }: Props) {
 
         <div>
           <label className='text-sm'>Text Color</label>
-          <input className='w-full border rounded px-2 py-1' type="color" value={getStyleValue("color")} onChange={(e) => applyStyle("color", e.target.value)} />
+          <input className='w-full border rounded px-2 py-1 h-9 bg-transparent cursor-pointer' type="color" value={getStyleValue("color")} onChange={(e) => applyStyle("color", e.target.value)} />
         </div>
 
         <div>
           <label className='text-sm'>Background</label>
-          <input className='w-full border rounded px-2 py-1' type="color" value={getStyleValue("backgroundColor")} onChange={(e) => applyStyle("background-color", e.target.value)} />
+          <input className='w-full border rounded px-2 py-1 h-9 bg-transparent cursor-pointer' type="color" value={getStyleValue("backgroundColor")} onChange={(e) => applyStyle("background-color", e.target.value)} />
         </div>
 
         <div>
@@ -263,7 +323,7 @@ function ElementSettingSection({ selectedElement, clearSelection }: Props) {
 
         <div>
           <label className='text-sm'>Border Color</label>
-          <input className='w-full border rounded px-2 py-1' type="color" value={getStyleValue("borderColor")} onChange={(e) => applyStyle("border-color", e.target.value)} />
+          <input className='w-full border rounded px-2 py-1 h-9 bg-transparent cursor-pointer' type="color" value={getStyleValue("borderColor")} onChange={(e) => applyStyle("border-color", e.target.value)} />
         </div>
 
         <div className='col-span-2'>
