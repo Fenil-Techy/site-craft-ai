@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import UserDetailContext from '@/context/UserDetailContext';
 import { SignInButton, useAuth, useUser } from '@clerk/nextjs';
 import axios from 'axios';
-import { ArrowUp, ImagePlus, Layout, LayoutDashboard, Loader2Icon, ShoppingCart, Sparkles, User } from 'lucide-react'
+import { ArrowUp, BrainCircuit, Cloud, Code2, Database, GraduationCap, ImagePlus, Layout, LayoutDashboard, Loader2Icon, Palette, Rocket, ShoppingCart, Smartphone, Sparkles, User } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 import React, { useContext, useState } from 'react'
 import { toast } from 'sonner';
@@ -71,34 +71,52 @@ function Hero() {
 
   const suggestions = [
     {
-      label: "SaaS Dashboard",
+      label: "AI Engineer",
       prompt:
-        "Create an analytics dashboard for a SaaS product to track users, revenue, subscriptions, and key business metrics with charts and KPIs.",
-      icon: LayoutDashboard,
+        "Create a premium personal portfolio for an AI Engineer with hero, profile image, about, skills, AI projects, experience, certifications and contact section using a modern dark theme.",
+      icon: BrainCircuit,
     },
     {
-      label: "Landing Page",
+      label: "Student",
       prompt:
-        "Create a high-converting landing page for a startup or SaaS product with hero section, features, pricing, testimonials, and CTA.",
-      icon: Layout,
+        "Create a modern personal portfolio for a Computer Science student with hero, education, skills, projects, achievements, certifications and contact section.",
+      icon: GraduationCap,
     },
     {
-      label: "E-commerce Store",
+      label: "Full Stack Developer",
       prompt:
-        "Build a modern e-commerce website with product listings, filters, product detail pages, cart, and checkout flow.",
-      icon: ShoppingCart,
+        "Create a premium portfolio for a Full Stack Developer showcasing experience, tech stack, featured projects, GitHub links and contact section.",
+      icon: Code2,
     },
     {
-      label: "Portfolio Website",
+      label: "UI/UX Designer",
       prompt:
-        "Create a clean personal portfolio website to showcase projects, skills, experience, and contact information.",
-      icon: User,
+        "Create a creative portfolio for a UI/UX Designer with hero, about, case studies, selected work, design process and contact section.",
+      icon: Palette,
     },
     {
-      label: "AI Startup Website",
+      label: "Mobile Developer",
       prompt:
-        "Build a futuristic AI startup website explaining the product, features, use cases, pricing, and include a strong call-to-action.",
-      icon: Sparkles,
+        "Create a modern portfolio for a Mobile App Developer showcasing Flutter and React Native projects, skills and experience.",
+      icon: Smartphone,
+    },
+    {
+      label: "Data Scientist",
+      prompt:
+        "Create a premium portfolio for a Data Scientist with machine learning projects, research, skills, education and contact information.",
+      icon: Database,
+    },
+    {
+      label: "DevOps Engineer",
+      prompt:
+        "Create a professional portfolio for a DevOps Engineer highlighting cloud infrastructure, Kubernetes, CI/CD projects and certifications.",
+      icon: Cloud,
+    },
+    {
+      label: "Startup Founder",
+      prompt:
+        "Create a personal portfolio for a Startup Founder highlighting journey, startups, products, achievements and contact section.",
+      icon: Rocket,
     },
   ];
   if (!isLoaded) {
@@ -114,12 +132,16 @@ function Hero() {
       <div className="absolute -bottom-20 -left-20 sm:bottom-0 sm:left-10 lg:left-20 h-[240px] w-[240px] sm:h-[400px] sm:w-[400px] lg:h-[500px] lg:w-[500px] rounded-full bg-purple-500 opacity-20 blur-3xl -z-10 pointer-events-none" />
 
       {/* header & description */}
-      <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white max-w-3xl">
-        Want to build your <br className="sm:hidden" /> own website?
-      </h2>
-      <p className="text-sm sm:text-base md:text-xl lg:text-2xl text-gray-300 mt-3 sm:mt-4 max-w-xl mx-auto px-1">
-        Craft your website with AI and get it done in minutes
-      </p>
+      <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white max-w-4xl leading-tight">
+  Create a Portfolio That
+  <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-blue-400 bg-clip-text text-transparent">
+    {" "}Gets You Hired
+  </span>
+</h2>
+
+<p className="text-sm sm:text-base md:text-xl text-gray-300 mt-5 max-w-2xl mx-auto">
+  Instantly generate a beautiful, professional portfolio with AI and impress recruiters, clients, and hiring managers.
+</p>
 
       {/* Input box */}
       <div className="w-full max-w-2xl border mt-5 sm:mt-6 p-4 sm:p-5 rounded-2xl bg-black mx-auto">
@@ -188,22 +210,37 @@ function Hero() {
           )}
         </div>
       </div>
-
-      {/* suggestions list */}
-      <div className="w-full max-w-xl mx-auto   grid grid-cols-2 min-[420px]:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 mt-5 sm:mt-6">
-        {suggestions.map((sug, index) => (
-          <Button
-            key={index}
-            variant="heroButton"
-            size="xs"
-            className="w-full whitespace-normal text-left sm:text-center justify-center sm:justify-center h-auto min-h-8 py-2"
-            onClick={() => setUserInput(sug.prompt)}
-          >
-            <sug.icon className="shrink-0" />
-            {sug.label}
-          </Button>
-        ))}
-      </div>
+      <div className="w-full max-w-4xl mx-auto mt-6">
+  {/* Responsive wrapper:
+    - On small screens: Horizontal single-row scrolling with no scrollbar clutter
+    - On sm/md screens up: Wraps cleanly and centers items automatically
+  */}
+  <div className="flex flex-nowrap sm:flex-wrap items-center justify-start sm:justify-center gap-2.5 overflow-x-auto sm:overflow-x-visible px-4 sm:px-0 scrollbar-none pb-2 sm:pb-0">
+    {suggestions.map((sug, index) => (
+      <Button
+        key={index}
+        variant="heroButton"
+        // Switched to dynamic sizing to fit mobile touch targets nicely
+        size="sm"
+        onClick={() => setUserInput(sug.prompt)}
+        className="
+          rounded-full
+          h-9 sm:h-10
+          px-3.5 sm:px-4
+          text-xs sm:text-sm
+          whitespace-nowrap
+          shrink-0
+          transition-all duration-200
+          hover:scale-105
+          active:scale-98
+        "
+      >
+        <sug.icon className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
+        {sug.label}
+      </Button>
+    ))}
+  </div>
+</div>
     </div>
   )
 }
