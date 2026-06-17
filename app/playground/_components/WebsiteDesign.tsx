@@ -1,6 +1,6 @@
 'use client'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
-import WebpageTool from './WebpageTool';
+
 import ElementSettingSection from './ElementSettingSection';
 import ImageSettingSection from './ImageSetting';
 import { OnSaveContext } from '@/context/OnSaveContext';
@@ -82,29 +82,38 @@ function WebsiteDesign({ generatedCode ,screenSize }: Props) {
             if (!target) return null;
             let element: HTMLElement | null = null;
             const nodeTarget = target as Node;
-
+        
             // Use nodeType checks instead of instanceof (iframe-safe across realms)
             if (nodeTarget.nodeType === 1) {
                 element = nodeTarget as HTMLElement;
             } else if (nodeTarget.nodeType === 3) {
                 element = nodeTarget.parentElement;
             }
-
+        
             if (!element) return null;
-
+        
             const root = doc.getElementById("root");
             if (!root || !root.contains(element)) return null;
-
-            const semanticParent = element.closest(
-                "section, article, nav, header, footer, aside, main, form, button, a, li, card, [data-component]"
+        
+            // 1. Check if the user directly clicked a specific interactive/content element
+            const innerTarget = element.closest(
+                "button, a, img, h1, h2, h3, h4, h5, h6, p, span, li, input, textarea, label, [data-component]"
             );
-
+            if (innerTarget && root.contains(innerTarget)) {
+                return innerTarget as HTMLElement;
+            }
+        
+            // 2. Fallback to larger layout wrappers if they didn't hit micro-content directly
+            const semanticParent = element.closest(
+                "section, article, nav, header, footer, aside, main, form, card"
+            );
+        
             const candidate = (semanticParent as HTMLElement | null) ?? element;
             if (candidate === doc.body || candidate === doc.documentElement || candidate.id === "root") {
                 const firstChild = doc.getElementById("root")?.firstElementChild;
                 return firstChild && firstChild.nodeType === 1 ? (firstChild as HTMLElement) : null;
             }
-
+        
             return candidate;
         };
 
@@ -227,31 +236,47 @@ function WebsiteDesign({ generatedCode ,screenSize }: Props) {
         onSave && HandleOnSave()
     },[onSave])
 
-    const HandleOnSave=async()=>{
-        if(iframeRef.current){
+    const HandleOnSave = async () => {
+        if (iframeRef.current) {
             try {
-                const iframeDoc=iframeRef.current.contentDocument
+                const iframeDoc = iframeRef.current.contentDocument
                 || iframeRef.current.contentWindow?.document
-
-                if(iframeDoc){
-                    const cloneDoc=iframeDoc.documentElement.cloneNode(true) as HTMLElement
-                    const allEle=cloneDoc.querySelectorAll<HTMLElement>("*")
-                    allEle.forEach(el => {
-                        el.style.outline='';
-                        el.style.cursor='';
+    
+                if (iframeDoc) {
+                    // 1. Grab the inner contents of #root from the live iframe safely
+                    const rootEl = iframeDoc.getElementById("root");
+                    if (!rootEl) return;
+    
+                    // 2. Clone ONLY the generated inner content to clean it for the DB
+                    const cloneRoot = rootEl.cloneNode(true) as HTMLElement;
+                    
+                    // 3. Strip editor runtime visual helpers from the cloned bundle
+                    const allCleanTargets = cloneRoot.querySelectorAll<HTMLElement>("*");
+                    allCleanTargets.forEach(el => {
+                        el.style.outline = '';
+                        el.style.cursor = '';
+                        // Clean up contenteditable attributes so saved sites aren't editable live
+                        el.removeAttribute("contenteditable"); 
                     });
-                    const html=cloneDoc.outerHTML
-                    console.log(html)
-                    const result = await axios.put("/api/frames",{
-                        designCode:html,
-                        frameId:frameId,projectId:projectId
-                      })
-                      console.log(result.data)
-                      toast.success("Saved Successfully")
+    
+                    // Get the cleaned inner HTML content
+                    const cleanedHtml = cloneRoot.innerHTML;
+                    console.log("Saving clean code:", cleanedHtml);
+    
+                    // 4. Dispatch the clean code back to your API
+                    const result = await axios.put("/api/frames", {
+                        designCode: cleanedHtml,
+                        frameId: frameId,
+                        projectId: projectId
+                    });
+                    
+                    console.log(result.data);
+                    toast.success("Saved Successfully");
                 }
-
+    
             } catch (error) {
-                console.log(error)
+                console.log("Error saving layout state:", error);
+                toast.error("Failed to save changes");
             }
         }
     }
