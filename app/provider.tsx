@@ -20,7 +20,7 @@ function Provider({
         if(!user) return
 
         void axios.post('/api/users/',{}).then((result)=>{
-            console.log(result.data)
+            
             setUserDetail(result.data?.user ?? null)
         })
     },[user])
