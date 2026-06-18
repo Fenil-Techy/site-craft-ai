@@ -11,8 +11,8 @@ export const AI_MODELS = [
     },
    
     {
-      id: "xiaomi/mimo-v2-flash",
-      name: "Xiaomi MiMo-v2-flash",
+      id: "xiaomi/mimo-v2.5",
+      name: "Xiaomi MiMo-v2.5",
       logo: "/model-logo/xiaomi.png",
     },
   ];

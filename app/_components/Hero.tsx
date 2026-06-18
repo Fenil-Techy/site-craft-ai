@@ -60,8 +60,14 @@ function Hero() {
         credits: userDetail?.credits,
         model: selectedModel
       })
-      console.log(result.data)
+      
       toast.success('Project created')
+      if (!hasUnlimitedAcess && userDetail) {
+        setUserDetail({
+          ...userDetail,
+          credits: userDetail.credits - 1 // Syncs UI to match backend atomic deduction
+        })
+      }
       router.push(`/playground/${projectId}?frameId=${frameId}`)
       setLoading(false)
     } catch (error) {

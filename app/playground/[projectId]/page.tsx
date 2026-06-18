@@ -304,7 +304,7 @@ Provide meaningful alt text.
 
 # RESPONSIVENESS
 
-Must be mobile-first.
+Must be mobile-first with responsive header.
 
 Responsive across all breakpoints.
 
@@ -351,7 +351,7 @@ Always finish with the final closing tag.
 
 `
 function Playground() {
-  console.log("Playground render");
+ 
   const lastLengthRef = useRef(0);
   const [chatOpen, setChatOpen] = useState(false);
   const { projectId } = useParams()
@@ -417,7 +417,7 @@ function Playground() {
     ]);
     const model = modelToUse ?? selectedModel;
 
-    console.log("Using model:", model);
+   
     try {
       // const chatHistory = [
       //   ...(messages ?? []),

@@ -6,88 +6,107 @@ import {
   usersTable,
 } from "@/config/schema";
 import { auth, currentUser } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
+import { eq, and, gt, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-  const {
-    projectId,
-    frameId,
-    messages,
-    model,
-  } = await req.json();
+  try {
+    // 1. Authenticate user server-side
+    const user = await currentUser();
+    const email = user?.primaryEmailAddress?.emailAddress;
 
-  const user = await currentUser();
-  const email = user?.primaryEmailAddress?.emailAddress;
-
-  if (!email) {
-    return NextResponse.json(
-      { error: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-
-  // Get user's subscription
-  const { has } = await auth();
-  const hasUnlimitedAccess = has({ plan: "pro" });
-
-  // Get latest credits from DB
-  const dbUser = await db
-    .select()
-    .from(usersTable)
-    .where(eq(usersTable.email, email));
-
-  const currentDbUser = dbUser[0];
-
-  if (!currentDbUser) {
-    return NextResponse.json(
-      { error: "User not found" },
-      { status: 404 }
-    );
-  }
-
-  // Free users must have credits
-  if (!hasUnlimitedAccess) {
-    if (currentDbUser.credits <= 0) {
+    if (!email) {
       return NextResponse.json(
-        { error: "No credits left" },
-        { status: 403 }
+        { error: "Unauthorized access" },
+        { status: 401 }
       );
     }
 
-    // Deduct one credit
-    await db
-      .update(usersTable)
-      .set({
-        credits: currentDbUser.credits - 1,
-      })
-      .where(eq(usersTable.email, email));
+    // 2. Parse and validate incoming payload parameters
+    const body = await req.json();
+    const { projectId, frameId, messages, model } = body;
+
+    if (!projectId || !frameId || !model || !messages || !Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json(
+        { error: "Bad Request: Missing or malformed parameters" },
+        { status: 400 }
+      );
+    }
+
+    // 3. Evaluate Clerk tier status
+    const { has } = await auth();
+    const hasUnlimitedAccess = has({ plan: "pro" });
+
+    // 4. Handle Credits check securely WITHOUT db.transaction
+    if (!hasUnlimitedAccess) {
+      // ATOMIC UPDATE: Deduct a credit using clean template literal sql string injections
+      const updateResult = await db
+        .update(usersTable)
+        .set({
+          // This maps natively to PostgreSQL: SET "credits" = "credits" - 1
+          credits: sql`${usersTable.credits} - 1`, 
+        })
+        .where(
+          and(
+            eq(usersTable.email, email),
+            gt(usersTable.credits, 0) // Ensures user balance cannot pass under 0!
+          )
+        );
+    
+      // If rowCount is 0, the block intercepts script spammers safely
+      if (updateResult.rowCount === 0) {
+        return NextResponse.json(
+          { error: "Insufficient credits. Generation blocked." },
+          { status: 403 }
+        );
+      }
+    } else {
+      // For Pro users, just verify their account exists before creating data
+      const dbUser = await db
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.email, email))
+        .limit(1);
+
+      if (dbUser.length === 0) {
+        return NextResponse.json(
+          { error: "User profile not found" },
+          { status: 404 }
+        );
+      }
+    }
+
+    // 5. Execute core records instantiation safely since credits are verified
+    await db.insert(projectTable).values({
+      projectId,
+      createdBy: email,
+      selectedModel: model,
+    });
+
+    await db.insert(frameTable).values({
+      projectId,
+      frameId,
+    });
+
+    await db.insert(chatTable).values({
+      chatMessage: messages,
+      frameId,
+      createdBy: email,
+    });
+
+    // Return clean response back to client
+    return NextResponse.json({
+      projectId,
+      frameId,
+      messages,
+      model,
+    }, { status: 200 });
+
+  } catch (error) {
+    console.error("[PROTECTED_PROJECTS_POST_ERROR]:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
-
-  // Create project
-  await db.insert(projectTable).values({
-    projectId,
-    createdBy: email,
-    selectedModel: model,
-  });
-
-  // Create frame
-  await db.insert(frameTable).values({
-    projectId,
-    frameId,
-  });
-
-  // Save chat
-  await db.insert(chatTable).values({
-    chatMessage: messages,
-    frameId,
-    createdBy: email,
-  });
-
-  return NextResponse.json({
-    projectId,
-    frameId,
-    messages,
-    model,
-  });
 }
