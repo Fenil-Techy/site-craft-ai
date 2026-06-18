@@ -10,9 +10,8 @@ function Provider({
     children: React.ReactNode
   }) {
 
-    const [userDetail,setUserDetail]=useState<AppUser | null>(null)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const[onSave,setOnSave]=useState<any>(null)
+    const [userDetail, setUserDetail] = useState<AppUser | null>(null)
+    const [onSave, setOnSave] = useState<number | null>(null)
 
     const{user}=useUser()
 

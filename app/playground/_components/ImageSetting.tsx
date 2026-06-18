@@ -200,6 +200,7 @@ function ImageSettingSection({ selectedElement }: Props) {
                                 className="w-full h-full object-contain p-1 transition-transform duration-200 group-hover:scale-102"
                                 style={{ borderRadius }}
                                 onLoad={() => setLoading(false)}
+                                onError={() => setLoading(false)}
                             />
                         ) : (
                             <div className="text-center p-2 text-slate-500">
@@ -351,7 +352,10 @@ function ImageSettingSection({ selectedElement }: Props) {
                 <Input
                     type="text"
                     value={borderRadius}
-                    onChange={(e) => setBorderRadius(e.target.value)}
+                    onChange={(e) => {
+                        setBorderRadius(e.target.value);
+                        selectedElement.style.borderRadius = e.target.value;
+                    }}
                     placeholder="e.g. 8px or 50%"
                     className="mt-1"
                 />

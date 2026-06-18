@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 import React, { useContext, useState } from 'react'
 import { toast } from 'sonner';
 import { Loader } from '@/components/ui/loader';
-import { v4 as uuidv4 } from 'uuid';
 import {
   Select,
   SelectContent,
@@ -45,34 +44,39 @@ function Hero() {
       return;
     }
 
+    if (!userInput?.trim()) {
+      toast.error("Please describe your portfolio first.")
+      return;
+    }
+
     setLoading(true)
-    const projectId = uuidv4()
-    const frameId = generateRandomFrameNumber()
     const messages = [{
       role: "user",
       content: userInput
     }]
     try {
+      // 2.5 — IDs are now generated server-side; we read them from the response
       const result = await axios.post("/api/projects", {
-        projectId: projectId,
-        frameId: frameId,
         messages: messages,
         credits: userDetail?.credits,
         model: selectedModel
       })
-      
+
       toast.success('Project created')
       if (!hasUnlimitedAcess && userDetail) {
         setUserDetail({
           ...userDetail,
-          credits: userDetail.credits - 1 // Syncs UI to match backend atomic deduction
+          credits: userDetail.credits - 1
         })
       }
+      // Use the IDs the server generated and returned
+      const { projectId, frameId } = result.data
       router.push(`/playground/${projectId}?frameId=${frameId}`)
       setLoading(false)
     } catch (error) {
       toast.error("Internal server error")
       console.log(error)
+      setLoading(false)
     }
   }
 
@@ -219,7 +223,7 @@ function Hero() {
             </SignInButton>
           ) : (
             <Button 
-              disabled={!userInput} 
+              disabled={!userInput || loading} 
               onClick={CreateNewProject} 
               className="shrink-0"
               aria-label="Generate AI Project"
@@ -260,8 +264,3 @@ function Hero() {
 }
 
 export default Hero
-
-const generateRandomFrameNumber = () => {
-  const num = Math.floor(Math.random() * 10000);
-  return num
-}

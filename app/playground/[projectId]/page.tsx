@@ -427,22 +427,16 @@ function Playground() {
       //   },
       // ];
       
-      const res=await fetch("/api/ai-model", {
+      const res = await fetch("/api/ai-model", {
         method: "POST",
         body: JSON.stringify({
           model,
           messages: [
             {
               role: "system",
-              content: `
-          ${prompt.replace("{userInput}", "")}
-          
-          If an assistant message contains HTML, edit it.
-          Do not create a new website.
-          Return complete updated HTML.
-          `,
+              content: prompt.replace("{userInput}", userInput),
             },
-          
+
             ...(generatedCode
               ? [
                   {
@@ -451,9 +445,9 @@ function Playground() {
                   },
                 ]
               : []),
-          
+
             ...(messages ?? []),
-          
+
             {
               role: "user",
               content: userInput,
@@ -575,13 +569,6 @@ function Playground() {
   };
 
   
-
-  const SaveMessages = async () => {
-    const result = await axios.put("/api/chats", {
-      messages: messages,
-      frameId: frameId
-    })
-  }
 
 
   const SaveGeneratedCode = async (code: string) => {

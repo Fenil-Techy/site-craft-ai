@@ -73,7 +73,16 @@ export async function PUT(req: NextRequest) {
             { error: "Unauthorized" },
             { status: 401 }
         );
-    } 
+    }
+
+    // 2.8 — Guard against oversized designCode payloads (max 500 KB)
+    if (typeof designCode === "string" && designCode.length > 500_000) {
+        return NextResponse.json(
+            { error: "designCode exceeds maximum allowed size of 500KB." },
+            { status: 413 }
+        );
+    }
+
     const project = await db
     .select()
     .from(projectTable)

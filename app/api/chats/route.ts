@@ -1,13 +1,67 @@
 import { db } from "@/config/db";
-import { chatTable } from "@/config/schema";
-import { eq } from "drizzle-orm";
+import { chatTable, frameTable, projectTable } from "@/config/schema";
+import { and, eq } from "drizzle-orm";
+import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(req:NextRequest){
-    const {frameId,messages}=await req.json();
-    const result=await db.update(chatTable).set({
-        chatMessage:messages
-    }).where(eq(chatTable.frameId,frameId))
+export async function PUT(req: NextRequest) {
+  // 2.2 — Auth guard: require a valid Clerk session
+  const user = await currentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    return NextResponse.json({result:"updated"})
+  const email = user.primaryEmailAddress?.emailAddress;
+  if (!email) {
+    return NextResponse.json({ error: "User email not found" }, { status: 400 });
+  }
+
+  const body = await req.json();
+  const { frameId, messages } = body;
+
+  if (!frameId || !Array.isArray(messages)) {
+    return NextResponse.json(
+      { error: "Bad Request: frameId and messages array required." },
+      { status: 400 }
+    );
+  }
+
+  // Verify the caller owns the project this frame belongs to
+  const frameResult = await db
+    .select({ projectId: frameTable.projectId })
+    .from(frameTable)
+    .where(eq(frameTable.frameId, frameId))
+    .limit(1);
+
+  if (frameResult.length === 0) {
+    return NextResponse.json({ error: "Frame not found" }, { status: 404 });
+  }
+
+  const projectId = frameResult[0].projectId;
+  if (!projectId) {
+    return NextResponse.json({ error: "Frame has no associated project" }, { status: 400 });
+  }
+
+  const projectResult = await db
+    .select()
+    .from(projectTable)
+    .where(
+      and(
+        eq(projectTable.projectId, projectId),
+        eq(projectTable.createdBy, email)
+      )
+    )
+    .limit(1);
+
+  if (projectResult.length === 0) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  // Safe to update
+  await db
+    .update(chatTable)
+    .set({ chatMessage: messages })
+    .where(eq(chatTable.frameId, frameId));
+
+  return NextResponse.json({ result: "updated" });
 }

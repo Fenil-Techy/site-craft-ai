@@ -49,10 +49,13 @@ function WebsiteDesign({ generatedCode ,screenSize }: Props) {
     
     const [selectedElementLabel, setSelectedElementLabel] = useState<string>("No component selected")
     const [selectedElement, setSelectedElement] = useState<HTMLElement | null>(null)
-    const{onSave,setOnSave}=useContext(OnSaveContext)
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const selectedElementRef = useRef<HTMLElement | null>(null);
     const clearSelectionRef = useRef<() => void>(() => { });
+
+    const context = useContext(OnSaveContext);
+    if (!context) throw new Error('OnSaveContext not provided');
+    const { onSave, setOnSave } = context;
 
     const{projectId}=useParams()
     const params=useSearchParams()
@@ -305,6 +308,7 @@ function WebsiteDesign({ generatedCode ,screenSize }: Props) {
                 <div className="flex min-h-0 flex-1 items-stretch justify-center bg-muted/20 p-3 sm:px-4 sm:py-4">
                     <iframe
                         ref={iframeRef}
+                        title="Generated website preview"
                         className={`h-full w-full min-h-[160px] rounded-xl ${
                           screenSize === "desktop"
                             ? "max-w-full"

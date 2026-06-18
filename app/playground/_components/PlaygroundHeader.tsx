@@ -52,9 +52,9 @@ const HTML_CODE = `<!DOCTYPE html>
 
       </html>`
 function PlaygroundHeader({ screenSize, setScreenSize, code }: any) {
-  
-  const { onSave, setOnSave } = useContext(OnSaveContext)
-  // 1. Added safety state for loading status to fix compilation crash
+  const context = useContext(OnSaveContext)
+  if (!context) throw new Error('OnSaveContext not provided')
+  const { onSave, setOnSave } = context
   const [isSaving, setIsSaving] = useState(false)
 
   // Turn off loading animation briefly when onSave triggers complete

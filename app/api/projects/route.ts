@@ -8,6 +8,8 @@ import {
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { eq, and, gt, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,11 +24,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // 2.4 — Rate limit: 5 project creations per 60 seconds per user
+    const limited = await checkRateLimit(req, email, "projectCreation");
+    if (limited) return limited;
+
     // 2. Parse and validate incoming payload parameters
     const body = await req.json();
-    const { projectId, frameId, messages, model } = body;
+    const { messages, model } = body;
 
-    if (!projectId || !frameId || !model || !messages || !Array.isArray(messages) || messages.length === 0) {
+    // 2.5 — Generate IDs server-side; never trust client-supplied primary keys
+    const projectId = uuidv4();
+    const frameId = uuidv4();
+
+    if (!model || !messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
         { error: "Bad Request: Missing or malformed parameters" },
         { status: 400 }
