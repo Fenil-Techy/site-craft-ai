@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/select"
 import { AI_MODELS } from '@/config/models';
 import Image from 'next/image';
+
 function Hero() {
   const router = useRouter()
   const [userInput, setUserInput] = useState<string>()
@@ -119,9 +120,11 @@ function Hero() {
       icon: Rocket,
     },
   ];
+
   if (!isLoaded) {
     return <div className='flex items-center justify-center h-[80vh]'><Loader /></div>
   }
+
   return (
     <div className="relative flex flex-col items-center justify-center w-full min-h-[calc(100dvh-4rem)] lg:min-h-[80vh] px-4 sm:px-6 py-8 sm:py-12 text-center">
 
@@ -133,15 +136,15 @@ function Hero() {
 
       {/* header & description */}
       <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-bold text-white max-w-4xl leading-tight">
-  Create a Portfolio That
-  <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-blue-400 bg-clip-text text-transparent">
-    {" "}Gets You Hired
-  </span>
-</h2>
+        Create a Portfolio That
+        <span className="bg-linear-to-r from-violet-400 via-fuchsia-400 to-blue-400 bg-clip-text text-transparent">
+          {" "}Gets You Hired
+        </span>
+      </h2>
 
-<p className="text-sm sm:text-base md:text-xl text-gray-300 mt-5 max-w-2xl mx-auto">
-  Instantly generate a beautiful, professional portfolio with AI and impress recruiters, clients, and hiring managers.
-</p>
+      <p className="text-sm sm:text-base md:text-xl text-gray-300 mt-5 max-w-2xl mx-auto">
+        Instantly generate a beautiful, professional portfolio with AI and impress recruiters, clients, and hiring managers.
+      </p>
 
       {/* Input box */}
       <div className="w-full max-w-2xl border mt-5 sm:mt-6 p-4 sm:p-5 rounded-2xl bg-black mx-auto">
@@ -158,21 +161,22 @@ function Hero() {
             onValueChange={setSelectedModel}
           >
             <SelectTrigger
+              aria-label="Select AI Model"
               className="
-      w-[220px]
-      h-11
-      rounded-xl
-      border border-white/10
-      bg-zinc-900/80
-      backdrop-blur-md
-      text-white
-      shadow-lg
-      hover:bg-zinc-800
-      transition-all
-      duration-200
-      focus:ring-2
-      focus:ring-blue-500
-    "
+                w-[220px]
+                h-11
+                rounded-xl
+                border border-white/10
+                bg-zinc-900/80
+                backdrop-blur-md
+                text-white
+                shadow-lg
+                hover:bg-zinc-800
+                transition-all
+                duration-200
+                focus:ring-2
+                focus:ring-blue-500
+              "
             >
               <SelectValue placeholder="Select AI Model" />
             </SelectTrigger>
@@ -187,7 +191,7 @@ function Hero() {
                   <div className="flex items-center gap-3">
                     <Image
                       src={model.logo}
-                      alt={model.name}
+                      alt={`${model.name} logo`}
                       width={20}
                       height={20}
                     />
@@ -199,48 +203,52 @@ function Hero() {
           </Select>
           {!user ? (
             <SignInButton mode="modal" forceRedirectUrl="/workspace">
-              <Button disabled={!userInput} className="shrink-0">
+              <Button 
+                disabled={!userInput} 
+                className="shrink-0"
+                aria-label="Sign in to generate project"
+              >
                 <ArrowUp />
               </Button>
             </SignInButton>
           ) : (
-            <Button disabled={!userInput} onClick={CreateNewProject} className="shrink-0">
+            <Button 
+              disabled={!userInput} 
+              onClick={CreateNewProject} 
+              className="shrink-0"
+              aria-label="Generate AI Project"
+            >
               {loading ? <Loader2Icon className="animate-spin" /> : <ArrowUp />}
             </Button>
           )}
         </div>
       </div>
       <div className="w-full max-w-4xl mx-auto mt-6">
-  {/* Responsive wrapper:
-    - On small screens: Horizontal single-row scrolling with no scrollbar clutter
-    - On sm/md screens up: Wraps cleanly and centers items automatically
-  */}
-  <div className="flex flex-nowrap sm:flex-wrap items-center justify-start sm:justify-center gap-2.5 overflow-x-auto sm:overflow-x-visible px-4 sm:px-0 scrollbar-none pb-2 sm:pb-0">
-    {suggestions.map((sug, index) => (
-      <Button
-        key={index}
-        variant="heroButton"
-        // Switched to dynamic sizing to fit mobile touch targets nicely
-        size="sm"
-        onClick={() => setUserInput(sug.prompt)}
-        className="
-          rounded-full
-          h-9 sm:h-10
-          px-3.5 sm:px-4
-          text-xs sm:text-sm
-          whitespace-nowrap
-          shrink-0
-          transition-all duration-200
-          hover:scale-105
-          active:scale-98
-        "
-      >
-        <sug.icon className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" />
-        {sug.label}
-      </Button>
-    ))}
-  </div>
-</div>
+        <div className="flex flex-nowrap sm:flex-wrap items-center justify-start sm:justify-center gap-2.5 overflow-x-auto sm:overflow-x-visible px-4 sm:px-0 scrollbar-none pb-2 sm:pb-0">
+          {suggestions.map((sug, index) => (
+            <Button
+              key={index}
+              variant="heroButton"
+              size="sm"
+              onClick={() => setUserInput(sug.prompt)}
+              className="
+                rounded-full
+                h-9 sm:h-10
+                px-3.5 sm:px-4
+                text-xs sm:text-sm
+                whitespace-nowrap
+                shrink-0
+                transition-all duration-200
+                hover:scale-105
+                active:scale-98
+              "
+            >
+              <sug.icon className="mr-1.5 sm:mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4" aria-hidden="true" />
+              {sug.label}
+            </Button>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

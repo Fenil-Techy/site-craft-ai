@@ -33,6 +33,7 @@ function Header() {
             width={40}
             height={40}
             className="h-7 w-7 shrink-0 sm:h-9 sm:w-9 lg:h-10 lg:w-10"
+            priority
           />
           <h2 className="truncate text-sm font-bold text-white sm:text-base md:text-xl lg:text-xl">
             <span className="text-blue-400">Craft</span><span className="text-purple-400">Portfolio</span>
