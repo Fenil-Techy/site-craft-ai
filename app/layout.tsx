@@ -6,7 +6,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Provider from "./provider";
 import { Toaster } from "@/components/ui/sonner";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from "@vercel/analytics/next"
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
@@ -36,53 +37,53 @@ export default function RootLayout({
       // Main card container
       card: 
         "bg-[#0b0f19] border border-slate-800/80 shadow-xl shadow-purple-500/5 backdrop-blur-md text-slate-100",
+        
+        // Text color overrides
+        headerTitle: "text-slate-100",
+        headerSubtitle: "text-slate-400",
+        formFieldLabel: "text-slate-300 font-medium",
+        footerActionText: "text-slate-400",
+        footerActionLink: "text-purple-400 hover:text-purple-300",
       
-      // Text color overrides
-      headerTitle: "text-slate-100",
-      headerSubtitle: "text-slate-400",
-      formFieldLabel: "text-slate-300 font-medium",
-      footerActionText: "text-slate-400",
-      footerActionLink: "text-purple-400 hover:text-purple-300",
-      
-      // Input field styles
-      formFieldInput: 
+        // Input field styles
+        formFieldInput: 
         "bg-slate-900 border-slate-800 text-slate-100 focus:border-purple-500 focus:ring-purple-500",
-      
-      // Social button styles (Google, GitHub, etc.)
-      socialButtonsBlockButton:
+        
+        // Social button styles (Google, GitHub, etc.)
+        socialButtonsBlockButton:
         "bg-slate-900/50 border border-slate-800 hover:bg-slate-900 hover:border-purple-500/50 transition-all duration-200",
-      
-      socialButtonsBlockButtonText:
+        
+        socialButtonsBlockButtonText:
         "!text-slate-200 font-medium",
-      
-      socialButtonsProviderIcon:
+        
+        socialButtonsProviderIcon:
         "opacity-100 filter drop-shadow-[0_0_4px_rgba(139,92,246,0.2)]",
       
       // Divider styles
       dividerLine:
         "bg-gradient-to-r from-transparent via-slate-800 to-transparent",
-      
-      dividerText:
+        
+        dividerText:
         "text-slate-400 font-medium text-xs tracking-wider uppercase",
-
-      // User Profile Button & Popover styles
-      userButtonPopoverCard: 
+        
+        // User Profile Button & Popover styles
+        userButtonPopoverCard: 
         "bg-[#0b0f19] border border-slate-800/80 shadow-lg shadow-purple-500/5",
-      
-      userButtonPopoverActionButton:
+        
+        userButtonPopoverActionButton:
         "text-slate-200 hover:bg-purple-950/30 hover:text-purple-300 transition-colors",
-      
-      userButtonPopoverActionButtonText:
+        
+        userButtonPopoverActionButtonText:
         "!text-slate-200 group-hover:text-purple-300",
-      
-      userButtonPopoverFooter:
+        
+        userButtonPopoverFooter:
         "bg-[#070a10] border-t border-slate-800/80",
         
-      // Primary Action Button styles (Sign In / Sign Up)
-      formButtonPrimary: 
+        // Primary Action Button styles (Sign In / Sign Up)
+        formButtonPrimary: 
         "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transform active:scale-[0.98] transition-all text-white font-semibold shadow-md shadow-purple-500/10",
-    },
-  }}
+      },
+    }}
 >
           <Provider>
             <TooltipProvider>
@@ -91,6 +92,8 @@ export default function RootLayout({
             </TooltipProvider>
           </Provider>
         </ClerkProvider>
+  <Analytics/>
+  <SpeedInsights/>
       </body>
     </html>
   )
