@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea" // Make sure to use your text element UI or standard textarea
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useRef, useState, useEffect, useCallback } from 'react'
 
 type Props = {
   selectedElement: HTMLElement | null,
@@ -66,6 +66,12 @@ function normalizeColor(value: string, fallback: string) {
 
 function ElementSettingSection({ selectedElement, clearSelection }: Props) {
   const [, setRerender] = useState(0)
+  // 3.4 — Debounce ref: DOM style is applied instantly; React re-render is batched.
+  const rerenderTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const debouncedRerender = useCallback(() => {
+    if (rerenderTimerRef.current) clearTimeout(rerenderTimerRef.current)
+    rerenderTimerRef.current = setTimeout(() => setRerender((v) => v + 1), 50)
+  }, [])
   const [draftStyles, setDraftStyles] = useState<Partial<Record<"lineHeight" | "letterSpacing" | "padding" | "margin" | "borderRadius" | "borderWidth", string>>>({})
   
   // Dynamic draft state for editing the text string directly
@@ -231,12 +237,29 @@ function ElementSettingSection({ selectedElement, clearSelection }: Props) {
 
         <div>
           <label className='text-sm'>Text Color</label>
-          <input className='w-full border rounded px-2 py-1 h-9 bg-transparent cursor-pointer' type="color" value={getStyleValue("color")} onChange={(e) => applyStyle("color", e.target.value)} />
+          <input
+            className='w-full border rounded px-2 py-1 h-9 bg-transparent cursor-pointer'
+            type="color"
+            value={getStyleValue("color")}
+            onChange={(e) => {
+              // Apply to DOM immediately for visual feedback; debounce the React state update
+              if (selectedElement) selectedElement.style.setProperty("color", e.target.value, "important")
+              debouncedRerender()
+            }}
+          />
         </div>
 
         <div>
           <label className='text-sm'>Background</label>
-          <input className='w-full border rounded px-2 py-1 h-9 bg-transparent cursor-pointer' type="color" value={getStyleValue("backgroundColor")} onChange={(e) => applyStyle("background-color", e.target.value)} />
+          <input
+            className='w-full border rounded px-2 py-1 h-9 bg-transparent cursor-pointer'
+            type="color"
+            value={getStyleValue("backgroundColor")}
+            onChange={(e) => {
+              if (selectedElement) selectedElement.style.setProperty("background-color", e.target.value, "important")
+              debouncedRerender()
+            }}
+          />
         </div>
 
         <div>
@@ -328,7 +351,15 @@ function ElementSettingSection({ selectedElement, clearSelection }: Props) {
 
         <div className='col-span-2'>
           <label className='text-sm'>Opacity ({getStyleValue("opacity")})</label>
-          <input className='w-full' type="range" min="0" max="1" step="0.05" value={getStyleValue("opacity")} onChange={(e) => applyStyle("opacity", e.target.value)} />
+          <input
+            className='w-full'
+            type="range" min="0" max="1" step="0.05"
+            value={getStyleValue("opacity")}
+            onChange={(e) => {
+              if (selectedElement) selectedElement.style.setProperty("opacity", e.target.value, "important")
+              debouncedRerender()
+            }}
+          />
         </div>
       </div>
 
