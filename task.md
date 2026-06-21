@@ -88,17 +88,18 @@
 
 ---
 
-## Phase 6 — Scaling Infrastructure (In Progress - Stopped)
+## Phase 6 — Scaling Infrastructure ✅
 
 - [x] 6.1 · Add Drizzle DB Migration Workflow (programmatic migration scripts configured)
 - [x] 6.2 · Change `createdBy` FK from Email to User ID (completed database type migration + API routes updated)
+- [x] 6.3 · Normalize Chat Messages (One Row Per Message) (normalized to `messages` table, custom SQL migration data-transfer completed)
 - [x] 6.4 · Add Connection Pooling with PgBouncer or Neon Pooled URL (DIRECT_DATABASE_URL configured)
-- ~~6.3~~ left for future (Normalize Chat Messages)
-- ~~6.5~~ left for future (Add Background Job Queue)
-- ~~6.6~~ left for future (Add Proper Error Monitoring)
-- ~~6.7~~ left for future (Add Usage Analytics)
-- ~~6.8~~ left for future (Implement Webhook-Based Credit Sync)
-- ~~6.9~~ left for future (Add CDN for Static Assets)
-- ~~6.10~~ left for future (Add A/B Testing Infrastructure)
+- [x] 6.6 · Add Proper Error Monitoring (Sentry Next.js integration configured client and server-side)
+- [x] 6.7 · Add Usage Analytics (created `generation_logs` table, logs duration/model/tokens on endpoint)
+- [x] 6.8 · Implement Webhook-Based Credit Sync with Clerk (Clerk webhook endpoint created via svix signature verification)
+- [x] 6.9 · Add CDN for Static Assets (remotePatterns configured in nextConfig for Clerk, ImageKit, Unsplash)
+- [x] 6.10 · Add A/B Testing Infrastructure (Installed `posthog-js` and integrated identify checks)
+- ~~6.5~~ deferred/unnecessary (Visual editor relies on SSE streaming, client timeout increased to 5min)
+
 
 
