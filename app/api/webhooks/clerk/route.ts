@@ -104,6 +104,8 @@ export async function POST(req: Request) {
           name: fullName,
           email: email,
           credits: 2,
+          maxCredits: 2,
+          tier: "free",
         });
         console.log(`[CLERK_WEBHOOK] Created new user ${id}`);
       }
