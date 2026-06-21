@@ -15,6 +15,20 @@
       "when": 1782039353211,
       "tag": "0001_breezy_toad",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782048286382,
+      "tag": "0002_cynical_sally_floyd",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782048531555,
+      "tag": "0003_outgoing_logan",
+      "breakpoints": true
     }
   ]
 }

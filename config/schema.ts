@@ -43,8 +43,6 @@ export const chatTable = pgTable("chats", {
 
   frameId: varchar().references(() => frameTable.frameId),
 
-  chatMessage: json(),
-
   createdBy: integer().references(() => usersTable.id),
 
   createdOn: timestamp().defaultNow(),
@@ -52,3 +50,26 @@ export const chatTable = pgTable("chats", {
   // 3.2 — Index on frameId so chat lookups by frame are O(log n)
   frameIdIdx: index("chat_frame_id_idx").on(t.frameId),
 }));
+
+export const messageTable = pgTable("messages", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  chatId: integer().references(() => chatTable.id),
+  role: varchar({ length: 50 }).notNull(),
+  content: text().notNull(),
+  createdAt: timestamp().defaultNow(),
+  sequenceNumber: integer().notNull()
+}, (t) => ({
+  chatIdIdx: index("message_chat_id_idx").on(t.chatId),
+}));
+
+export const generationLogsTable = pgTable("generation_logs", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  userId: integer().references(() => usersTable.id),
+  projectId: varchar(),
+  model: varchar().notNull(),
+  promptTokens: integer(),
+  completionTokens: integer(),
+  durationMs: integer(),
+  mode: varchar({ length: 50 }),
+  createdOn: timestamp().defaultNow(),
+});
