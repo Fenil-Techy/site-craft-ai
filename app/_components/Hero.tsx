@@ -24,6 +24,7 @@ function Hero() {
   const [userInput, setUserInput] = useState<string>()
   const { user, isLoaded } = useUser()
   const [loading, setLoading] = useState(false)
+  const [enhanceLoading, setEnhanceLoading] = useState(false)
   const context = useContext(UserDetailContext)
   const [selectedModel, setSelectedModel] = useState(
     "google/gemma-4-26b-a4b-it"
@@ -89,6 +90,32 @@ function Hero() {
       setLoading(false)
     }
   }
+
+  const handleEnhancePrompt = async () => {
+    if (!userInput?.trim()) {
+      toast.error("Please enter a short description to enhance.");
+      return;
+    }
+    
+    setEnhanceLoading(true);
+    try {
+      const result = await axios.post("/api/enhance-prompt", {
+        prompt: userInput,
+        model: selectedModel,
+      });
+      setUserInput(result.data.enhancedPrompt);
+      toast.success("Prompt enhanced!");
+    } catch (error: any) {
+      if (error.response?.status === 429) {
+         toast.error("Too many requests. Please slow down.");
+      } else {
+         toast.error("Failed to enhance prompt.");
+      }
+      console.log(error);
+    } finally {
+      setEnhanceLoading(false);
+    }
+  };
 
   const suggestions = [
     {
@@ -246,24 +273,49 @@ function Hero() {
             </SelectContent>
           </Select>
           {!user ? (
-            <SignInButton mode="modal" forceRedirectUrl="/workspace">
-              <Button
-                disabled={!userInput || (userInput?.trim().length ?? 0) < 10}
-                className="shrink-0"
-                aria-label="Sign in to generate project"
-              >
-                <ArrowUp />
-              </Button>
-            </SignInButton>
+            <div className="flex gap-2">
+              <SignInButton mode="modal" forceRedirectUrl="/workspace">
+                <Button
+                  variant="secondary"
+                  disabled={!userInput || (userInput?.trim().length ?? 0) < 10}
+                  className="shrink-0 gap-2 border-white/10 bg-zinc-800 text-white hover:bg-zinc-700"
+                  aria-label="Sign in to enhance prompt"
+                >
+                  <Sparkles size={16} />
+                  <span className="hidden sm:inline">Enhance</span>
+                </Button>
+              </SignInButton>
+              <SignInButton mode="modal" forceRedirectUrl="/workspace">
+                <Button
+                  disabled={!userInput || (userInput?.trim().length ?? 0) < 10}
+                  className="shrink-0"
+                  aria-label="Sign in to generate project"
+                >
+                  <ArrowUp />
+                </Button>
+              </SignInButton>
+            </div>
           ) : (
-            <Button
-              disabled={!userInput || loading || (userInput?.trim().length ?? 0) < 10}
-              onClick={CreateNewProject}
-              className="shrink-0"
-              aria-label="Generate AI Project"
-            >
-              {loading ? <Loader2Icon className="animate-spin" /> : <ArrowUp />}
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                disabled={!userInput || enhanceLoading || loading || (userInput?.trim().length ?? 0) < 10}
+                onClick={handleEnhancePrompt}
+                className="shrink-0 gap-2 border-white/10 bg-zinc-800 text-white hover:bg-zinc-700"
+                aria-label="Enhance Prompt"
+              >
+                {enhanceLoading ? <Loader2Icon className="animate-spin" size={16} /> : <Sparkles size={16} />}
+                <span className="hidden sm:inline">Enhance</span>
+              </Button>
+              <Button
+                disabled={!userInput || loading || enhanceLoading || (userInput?.trim().length ?? 0) < 10}
+                onClick={CreateNewProject}
+                className="shrink-0"
+                aria-label="Generate AI Project"
+              >
+                {loading ? <Loader2Icon className="animate-spin" /> : <ArrowUp />}
+              </Button>
+            </div>
           )}
         </div>
       </div>
