@@ -68,7 +68,7 @@
 - [x] 4.9 · Input validation + character counter on Hero (min 10 / max 2000)
 - [x] 4.12 · Toast on AI generation failure
 - [x] 4.14 · Copy to clipboard button on assistant messages (hover reveal)
-- ~~4.10~~ deferred (needs DB schema migration)
+- [x] 4.10 · Project title/name feature (auto-generate from AI)
 - ~~4.13~~ deferred (L complexity, belongs to Phase 5)
 
 ---

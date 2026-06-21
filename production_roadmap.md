@@ -1281,6 +1281,10 @@ These tasks are frozen. They require significant effort but have near-zero ROI u
 
 | # | Task | Reason to Defer |
 |---|---|---|
+| 4.13 | Undo / Revision History | L complexity — only valuable after users express frustration losing edits |
+| 5.7 | AI Edit Diff Visualization | L complexity — visual polish feature, not blocking core value |
+| 7.4 | Referral System | L complexity — viral loop only matters once there are users to refer |
+| 7.6 | Team / Workspace Plans | XL complexity — needs paying org customers first (Clerk Organizations) |
 | 8.1 | Full Audit Logging | No compliance need, no enterprise customers |
 | 8.2 | GDPR Compliance | Matters at EU user volume; ship Privacy Policy page manually for now |
 | 8.3 | SOC 2 / ISO 27001 | Enterprise sales prerequisite — years away |
@@ -1288,7 +1292,7 @@ These tasks are frozen. They require significant effort but have near-zero ROI u
 | 8.5 | SSO (SAML / OIDC) | Enterprise IT requirement — not relevant pre-revenue |
 | 8.10 | Data Residency Options | Regional infrastructure problem — not relevant at current scale |
 
-> To re-activate any of these, move them back into the active Phase 8 section above.
+> To re-activate any of these, move them back into the relevant active phase section.
 
 ---
 
