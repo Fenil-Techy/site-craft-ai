@@ -7,6 +7,8 @@ export interface DBUser {
   name: string;
   email: string;
   credits: number;
+  maxCredits: number;
+  tier: string;
   clerkId: string | null;
 }
 
@@ -55,6 +57,8 @@ export async function getOrCreateUser(clerkUser: any): Promise<DBUser | null> {
     email: email,
     clerkId: clerkId,
     credits: 2,
+    maxCredits: 2,
+    tier: "free",
   };
 
   const insertResult = await db
