@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useContext } from 'react'
 import PlaygroundHeader from '../_components/PlaygroundHeader'
 import ChatSection from '../_components/ChatSection'
 import WebsiteDesign from '../_components/WebsiteDesign'
@@ -13,6 +13,8 @@ import { Sparkles, X } from 'lucide-react'
 import { Loader } from '@/components/ui/loader'
 import { buildSystemPrompt } from '@/config/prompts'
 import { buildContextWindow } from '@/lib/context-manager'
+import UserDetailContext from '@/context/UserDetailContext'
+import { useAuth } from '@clerk/nextjs'
 
 export type Messages = {
   role: string,
@@ -26,6 +28,11 @@ export type Frame = {
 }
 
 function Playground() {
+  const context = useContext(UserDetailContext)
+  const userDetail = context?.userDetail
+  const { has } = useAuth()
+  const hasUnlimitedAccess = has ? has({ plan: 'pro' }) : false
+  const isPro = hasUnlimitedAccess || userDetail?.tier === 'pro'
  
   const lastLengthRef = useRef(0);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -122,7 +129,7 @@ function Playground() {
       const apiMessages = [
         {
           role: "system",
-          content: buildSystemPrompt(userInput),
+          content: buildSystemPrompt(userInput, undefined, isPro),
         },
         ...(summaryMessage ? [summaryMessage] : []),
         ...(generatedCode
@@ -280,7 +287,8 @@ function Playground() {
     <div className="flex h-dvh flex-col overflow-hidden bg-background">
       <PlaygroundHeader screenSize={screenSize}
         setScreenSize={(v: string) => setScreenSize(v)}
-        code={generatedCode} />
+        code={generatedCode}
+        isPro={isPro} />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
         {/* Desktop */}
         <div className="hidden lg:flex">
@@ -358,7 +366,7 @@ function Playground() {
           )}
         </div>
         <main className="relative order-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden lg:order-2 lg:h-full">
-          <WebsiteDesign generatedCode={generatedCode} screenSize={screenSize} />
+          <WebsiteDesign generatedCode={generatedCode} screenSize={screenSize} isPro={isPro} />
 
           {/* Initial DB fetch overlay */}
           {initialLoading && (
