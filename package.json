@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "npx tsx scripts/migrate.ts"
+    "db:migrate": "npx tsx scripts/migrate.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.0",
@@ -64,6 +65,7 @@
     "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.0.0"
   }
 }
