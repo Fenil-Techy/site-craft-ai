@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     const limited = await checkRateLimit(req, user.id, "aiGeneration");
     if (limited) return limited;
 
-    const { messages, model } = await req.json();
+    const { messages, model, stream } = await req.json();
 
     // 2.7 — Validate model against server-side allowlist
     if (!model || !ALLOWED_MODELS.has(model)) {
@@ -35,29 +35,69 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          messages,
-          stream: true,
-          max_tokens: 12000,
-        }),
+    // 5.8 — Multi-model fallback chain: Selected Model -> Gemma 4 26B -> Qwen 3 235B
+    const fallbackChain = [model];
+    if (!fallbackChain.includes("google/gemma-4-26b-a4b-it")) {
+      fallbackChain.push("google/gemma-4-26b-a4b-it");
+    }
+    if (!fallbackChain.includes("qwen/qwen3-235b-a22b-2507")) {
+      fallbackChain.push("qwen/qwen3-235b-a22b-2507");
+    }
+
+    let response: Response | null = null;
+    let lastError: any = null;
+
+    for (const currentModel of fallbackChain) {
+      try {
+        console.log(`[AI_MODEL] Attempting generation with model: ${currentModel}`);
+        response = await fetch(
+          "https://openrouter.ai/api/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: currentModel,
+              messages,
+              stream: stream !== false,
+              max_tokens: stream === false ? 1000 : 12000,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          console.log(`[AI_MODEL] Generation succeeded with model: ${currentModel}`);
+          break;
+        } else {
+          const errText = await response.text();
+          lastError = new Error(`Status ${response.status}: ${errText}`);
+          console.warn(`[AI_MODEL_FALLBACK] Failed model ${currentModel}. Error: ${errText}`);
+        }
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[AI_MODEL_FALLBACK] Request error for ${currentModel}. Error:`, err);
       }
-    );
+    }
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error("[AI_MODEL_ERROR]", error);
+    if (!response || !response.ok) {
+      console.error("[AI_MODEL_ALL_FALLBACKS_FAILED]", lastError);
+      return new Response(
+        JSON.stringify({ error: lastError?.message || "All models in fallback chain failed." }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
 
-      return new Response(error, {
-        status: response.status,
+    // Handle non-streaming response for utility endpoints (like summarization)
+    if (stream === false) {
+      const data = await response.json();
+      return new Response(JSON.stringify(data), {
         headers: {
           "Content-Type": "application/json",
         },
