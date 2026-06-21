@@ -1,5 +1,7 @@
-type AppUser={
-    name:string,
-    email:string,
-    credits:number
+type AppUser = {
+    id: number;
+    name: string;
+    email: string;
+    credits: number;
+    clerkId?: string | null;
 }
