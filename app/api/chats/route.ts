@@ -72,21 +72,19 @@ export async function PUT(req: NextRequest) {
 
   const chatId = chatRecord[0].id;
 
-  // Perform atomic delete and insert in a transaction
-  await db.transaction(async (tx) => {
-    await tx.delete(messageTable).where(eq(messageTable.chatId, chatId));
+  // Perform delete and insert sequentially because Neon HTTP driver does not support interactive transactions
+  await db.delete(messageTable).where(eq(messageTable.chatId, chatId));
 
-    if (messages.length > 0) {
-      await tx.insert(messageTable).values(
-        messages.map((m: any, idx: number) => ({
-          chatId,
-          role: m.role,
-          content: m.content,
-          sequenceNumber: idx + 1,
-        }))
-      );
-    }
-  });
+  if (messages.length > 0) {
+    await db.insert(messageTable).values(
+      messages.map((m: any, idx: number) => ({
+        chatId,
+        role: m.role,
+        content: m.content,
+        sequenceNumber: idx + 1,
+      }))
+    );
+  }
 
   return NextResponse.json({ result: "updated" });
 }
