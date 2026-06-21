@@ -40,7 +40,8 @@ export function AppSidebar() {
 
     const { userDetail, setUserDetail } = context
     const { has } = useAuth()
-    const hasUnlimitedAcess = has({ plan: 'pro' })
+    const hasUnlimitedAcess = has ? has({ plan: 'pro' }) : false
+    const isPro = hasUnlimitedAcess || userDetail?.tier === 'pro';
 
     useEffect(() => {
         // 3.5 — TTL cache: treat entries older than 5 min as a miss
@@ -146,15 +147,45 @@ export function AppSidebar() {
                 {
                     open?
                     <>
-                {!hasUnlimitedAcess && <div className="p-3 space-y-3 bg-secondary border rounded-2xl">
-                    <h2 className="font-bold">Remaining Credits : <span>{!userDetail ? <Loader2Icon className="animate-spin" /> : userDetail.credits}</span></h2>
-                    {/* 4.7 — Use MAX_FREE_CREDITS constant instead of hardcoded 2 */}
-                    <Progress value={userDetail ? (userDetail?.credits / MAX_FREE_CREDITS) * 100 : null} />
-                    <Link href={"/pricing"} className="w-full">
-                        <Button className="w-full p-5 bg-black text-white">Upgrade to Unlimited</Button>
+                {isPro ? (
+                  <div className="p-3 bg-gradient-to-r from-amber-500/10 to-yellow-600/10 border border-amber-500/30 rounded-2xl flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-2 text-amber-500 font-bold text-sm">
+                      <span className="rounded-full bg-gradient-to-r from-amber-500 to-yellow-600 px-2 py-0.5 text-[10px] font-semibold text-white uppercase tracking-wider">
+                        Pro
+                      </span>
+                      Unlimited Access
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 space-y-3 bg-secondary border rounded-2xl">
+                    <h2 className="font-bold flex items-center justify-between text-sm sm:text-base">
+                      Remaining Credits: <span>{!userDetail ? <Loader2Icon className="animate-spin h-4 w-4" /> : userDetail.credits}</span>
+                    </h2>
+                    
+                    {/* Progress bar uses dynamic maxCredits */}
+                    <Progress value={userDetail ? (userDetail.credits / (userDetail.maxCredits || MAX_FREE_CREDITS)) * 100 : null} />
+                    
+                    {/* Low-credit warning */}
+                    {userDetail && userDetail.credits <= (userDetail.maxCredits || MAX_FREE_CREDITS) * 0.2 && userDetail.credits > 0 && (
+                      <div className="text-[11px] bg-amber-500/10 border border-amber-500/20 text-amber-500 p-2 rounded-lg leading-snug">
+                        ⚠️ Credits running low! Buy a pack or upgrade to Pro.
+                      </div>
+                    )}
+
+                    {/* Exhausted credits */}
+                    {userDetail && userDetail.credits === 0 && (
+                      <div className="text-[11px] bg-red-500/10 border border-red-500/20 text-red-500 p-2 rounded-lg leading-snug">
+                        🚫 Out of credits! Upgrade to Pro or buy a pack to continue.
+                      </div>
+                    )}
+
+                    <Link href={"/pricing"} className="w-full block">
+                        <Button className="w-full p-5 bg-black text-white hover:bg-zinc-900 transition-colors">
+                          {userDetail && userDetail.credits === 0 ? "Buy Credits / Pro" : "Upgrade to Pro"}
+                        </Button>
                     </Link>
-                </div>
-                }
+                  </div>
+                )}
                 </>
                 :
                 <div className="flex justify-center items-center">
