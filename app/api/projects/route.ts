@@ -10,19 +10,28 @@ import { eq, and, gt, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { v4 as uuidv4 } from "uuid";
+import { getOrCreateUser } from "@/lib/user-helper";
 
 export async function POST(req: NextRequest) {
   try {
     // 1. Authenticate user server-side
     const user = await currentUser();
-    const email = user?.primaryEmailAddress?.emailAddress;
-
-    if (!email) {
+    if (!user) {
       return NextResponse.json(
         { error: "Unauthorized access" },
         { status: 401 }
       );
     }
+
+    const dbUser = await getOrCreateUser(user);
+    if (!dbUser) {
+      return NextResponse.json(
+        { error: "User profile not found" },
+        { status: 404 }
+      );
+    }
+
+    const email = dbUser.email;
 
     // 2.4 — Rate limit: 5 project creations per 60 seconds per user
     const limited = await checkRateLimit(req, email, "projectCreation");
@@ -58,7 +67,7 @@ export async function POST(req: NextRequest) {
         })
         .where(
           and(
-            eq(usersTable.email, email),
+            eq(usersTable.id, dbUser.id),
             gt(usersTable.credits, 0) // Ensures user balance cannot pass under 0!
           )
         );
@@ -70,26 +79,12 @@ export async function POST(req: NextRequest) {
           { status: 403 }
         );
       }
-    } else {
-      // For Pro users, just verify their account exists before creating data
-      const dbUser = await db
-        .select()
-        .from(usersTable)
-        .where(eq(usersTable.email, email))
-        .limit(1);
-
-      if (dbUser.length === 0) {
-        return NextResponse.json(
-          { error: "User profile not found" },
-          { status: 404 }
-        );
-      }
     }
 
     // 5. Execute core records instantiation safely since credits are verified
     await db.insert(projectTable).values({
       projectId,
-      createdBy: email,
+      createdBy: dbUser.id,
       selectedModel: model,
     });
 
@@ -101,7 +96,7 @@ export async function POST(req: NextRequest) {
     await db.insert(chatTable).values({
       chatMessage: messages,
       frameId,
-      createdBy: email,
+      createdBy: dbUser.id,
     });
 
     // Return clean response back to client

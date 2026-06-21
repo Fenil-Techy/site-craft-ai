@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { desc, eq, inArray } from "drizzle-orm";
 import { chatTable, frameTable, projectTable } from "@/config/schema";
+import { getOrCreateUser } from "@/lib/user-helper";
 
 type ProjectListEntry = {
   projectId: string;
@@ -12,7 +13,7 @@ type ProjectListEntry = {
     id: number;
     frameId: string | null;
     chatMessage: unknown;
-    createdBy: string | null;
+    createdBy: number | null;
     createdOn: Date | null;
   }[];
 };
@@ -24,9 +25,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const email = user.primaryEmailAddress?.emailAddress;
-  if (!email) {
-    return NextResponse.json({ error: "User email not found" }, { status: 400 });
+  const dbUser = await getOrCreateUser(user);
+  if (!dbUser) {
+    return NextResponse.json({ error: "User profile not found" }, { status: 404 });
   }
 
   // 3.1 — Batch all queries: 3 total instead of 1 + N + N
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
   const projects = await db
     .select()
     .from(projectTable)
-    .where(eq(projectTable.createdBy, email))
+    .where(eq(projectTable.createdBy, dbUser.id))
     .orderBy(desc(projectTable.id));
 
   if (projects.length === 0) {

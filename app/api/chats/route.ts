@@ -3,6 +3,7 @@ import { chatTable, frameTable, projectTable } from "@/config/schema";
 import { and, eq } from "drizzle-orm";
 import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
+import { getOrCreateUser } from "@/lib/user-helper";
 
 export async function PUT(req: NextRequest) {
   // 2.2 — Auth guard: require a valid Clerk session
@@ -11,9 +12,9 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const email = user.primaryEmailAddress?.emailAddress;
-  if (!email) {
-    return NextResponse.json({ error: "User email not found" }, { status: 400 });
+  const dbUser = await getOrCreateUser(user);
+  if (!dbUser) {
+    return NextResponse.json({ error: "User profile not found" }, { status: 404 });
   }
 
   const body = await req.json();
@@ -48,7 +49,7 @@ export async function PUT(req: NextRequest) {
     .where(
       and(
         eq(projectTable.projectId, projectId),
-        eq(projectTable.createdBy, email)
+        eq(projectTable.createdBy, dbUser.id)
       )
     )
     .limit(1);

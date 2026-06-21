@@ -3,6 +3,7 @@ import { chatTable, frameTable, projectTable } from "@/config/schema";
 import { and, eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 import { currentUser } from "@clerk/nextjs/server";
+import { getOrCreateUser } from "@/lib/user-helper";
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
@@ -10,12 +11,18 @@ export async function GET(req: NextRequest) {
     const projectId = searchParams.get('projectId')
 
     const user = await currentUser();
-    const email = user?.primaryEmailAddress?.emailAddress;
-
-    if (!email) {
+    if (!user) {
         return NextResponse.json(
             { error: "Unauthorized" },
             { status: 401 }
+        );
+    }
+
+    const dbUser = await getOrCreateUser(user);
+    if (!dbUser) {
+        return NextResponse.json(
+            { error: "User profile not found" },
+            { status: 404 }
         );
     }
 
@@ -36,7 +43,7 @@ export async function GET(req: NextRequest) {
         .where(
             and(
                 eq(projectTable.projectId, projectId!),
-                eq(projectTable.createdBy, email)
+                eq(projectTable.createdBy, dbUser.id)
             )
         );
 
@@ -66,12 +73,18 @@ export async function PUT(req: NextRequest) {
 
     const { designCode, frameId, projectId } = await req.json()
     const user = await currentUser();
-    const email = user?.primaryEmailAddress?.emailAddress;
-
-    if (!email) {
+    if (!user) {
         return NextResponse.json(
             { error: "Unauthorized" },
             { status: 401 }
+        );
+    }
+
+    const dbUser = await getOrCreateUser(user);
+    if (!dbUser) {
+        return NextResponse.json(
+            { error: "User profile not found" },
+            { status: 404 }
         );
     }
 
@@ -89,7 +102,7 @@ export async function PUT(req: NextRequest) {
     .where(
       and(
         eq(projectTable.projectId, projectId),
-        eq(projectTable.createdBy, email)
+        eq(projectTable.createdBy, dbUser.id)
       )
     );
 
