@@ -108,7 +108,7 @@ function Playground() {
         abortControllerRef.current.abort();
         toast.error("Generation is taking too long. Please try again.");
       }
-    }, 90000);
+    }, 300000);
    
     try {
       const currentHistory = [
