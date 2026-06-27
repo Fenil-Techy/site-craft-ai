@@ -81,7 +81,7 @@
 - [x] 5.4 · Add Stream Timeout
 - [x] 5.8 · Multi-Model Fallback Chain
 - [x] 5.5 · Add "Enhance Prompt" Feature
-- ~~5.6~~ deferred
+- [x] 5.6 · Add Structured Output Validation
 - ~~5.7~~ deferred
 - ~~5.9~~ deferred
 - ~~5.10~~ deferred
