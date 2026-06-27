@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const limited = await checkRateLimit(req, dbUser.email, "aiGeneration");
     if (limited) return limited;
 
-    const { messages, model, stream } = await req.json();
+    const { messages, model, stream, projectId } = await req.json();
 
     // 2.7 — Validate model against server-side allowlist
     if (!model || !ALLOWED_MODELS.has(model)) {
@@ -186,6 +186,7 @@ Output EXACTLY 'CODE' or 'CHAT' (no formatting, no markdown, no other words).`
               model: currentModel,
               messages,
               stream: stream !== false,
+              stream_options: stream !== false ? { include_usage: true } : undefined,
               max_tokens: stream === false ? 1000 : 12000,
             }),
           }
@@ -226,6 +227,7 @@ Output EXACTLY 'CODE' or 'CHAT' (no formatting, no markdown, no other words).`
       try {
         await db.insert(generationLogsTable).values({
           userId: dbUser.id,
+          projectId: projectId || null,
           model: usedModel,
           durationMs,
           promptTokens: usage?.prompt_tokens,
@@ -244,14 +246,41 @@ Output EXACTLY 'CODE' or 'CHAT' (no formatting, no markdown, no other words).`
 
     // Proxy the SSE stream back to the client
     const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+    let promptTokens = 0;
+    let completionTokens = 0;
 
     const readable = new ReadableStream({
       async start(controller) {
         try {
+          let buffer = "";
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
             controller.enqueue(value);
+
+            // Decode chunk text and process lines to find token usage info
+            const chunkText = decoder.decode(value, { stream: true });
+            buffer += chunkText;
+            const lines = buffer.split("\n");
+            buffer = lines.pop() ?? "";
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (trimmed.startsWith("data: ")) {
+                const dataStr = trimmed.slice(6);
+                if (dataStr === "[DONE]") continue;
+                try {
+                  const parsed = JSON.parse(dataStr);
+                  if (parsed.usage) {
+                    promptTokens = parsed.usage.prompt_tokens ?? 0;
+                    completionTokens = parsed.usage.completion_tokens ?? 0;
+                  }
+                } catch {
+                  // Partial chunk or non-JSON chunk — ignore safely
+                }
+              }
+            }
           }
         } finally {
           controller.close();
@@ -259,8 +288,11 @@ Output EXACTLY 'CODE' or 'CHAT' (no formatting, no markdown, no other words).`
           try {
             await db.insert(generationLogsTable).values({
               userId: dbUser.id,
+              projectId: projectId || null,
               model: usedModel,
               durationMs,
+              promptTokens: promptTokens || null,
+              completionTokens: completionTokens || null,
               mode: mode,
             });
           } catch (logErr) {

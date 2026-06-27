@@ -157,6 +157,7 @@ function Playground() {
         body: JSON.stringify({
           model,
           messages: apiMessages,
+          projectId: Array.isArray(projectId) ? projectId[0] : projectId,
         }),
       });
       
