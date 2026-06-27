@@ -1,14 +1,17 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react'
 import { Messages } from '../[projectId]/page'
-import { ArrowUp, Check, Copy, Loader2Icon } from 'lucide-react'
+import { ArrowUp, Check, Copy, Lock, Loader2Icon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Loader } from '@/components/ui/loader'
+import Link from 'next/link'
 
 type Props = {
   messages: Messages[]
   onSend: (input: string) => void
   loading: boolean
+  /** When true, the input is replaced with an upgrade prompt (free tier limit) */
+  chatBlocked?: boolean
 }
 
 // 4.6 — Animated typing indicator shown while AI is streaming
@@ -58,7 +61,7 @@ function CopyButton({ text }: { text: string }) {
   )
 }
 
-function ChatSection({ messages, onSend, loading }: Props) {
+function ChatSection({ messages, onSend, loading, chatBlocked = false }: Props) {
   const [input, setInput] = useState<string>('')
   // 4.1 — Scroll anchor ref at the bottom of the message list
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -110,31 +113,44 @@ function ChatSection({ messages, onSend, loading }: Props) {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="shrink-0 flex items-end gap-2 border-t p-2 sm:p-3">
-        <textarea
-          className="min-h-10 max-h-28 flex-1 resize-none rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 sm:text-base"
-          // 4.2 — Updated placeholder to hint at keyboard shortcut
-          placeholder="Describe your changes… (Ctrl+Enter to send)"
-          rows={2}
-          onChange={(e) => setInput(e.target.value)}
-          value={input}
-          // 4.2 — Ctrl+Enter / Cmd+Enter to send
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-              e.preventDefault()
-              handleSend()
-            }
-          }}
-        />
-        <Button
-          className="shrink-0"
-          onClick={handleSend}
-          disabled={loading || !input.trim()}
-          aria-label="Send message"
-        >
-          {loading ? <Loader2Icon className="animate-spin" /> : <ArrowUp />}
-        </Button>
-      </div>
+      {/* Chat input — blocked for free tier after first generation */}
+      {chatBlocked ? (
+        <div className="shrink-0 border-t p-3 sm:p-4 flex flex-col items-center gap-2 bg-zinc-950/60">
+          <div className="flex items-center gap-2 text-zinc-400 text-sm">
+            <Lock className="h-4 w-4 text-blue-400 shrink-0" />
+            <span>Free plan — one generation only</span>
+          </div>
+          <Link href="/pricing" className="w-full">
+            <Button className="w-full bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold">
+              Upgrade to send more messages
+            </Button>
+          </Link>
+        </div>
+      ) : (
+        <div className="shrink-0 flex items-end gap-2 border-t p-2 sm:p-3">
+          <textarea
+            className="min-h-10 max-h-28 flex-1 resize-none rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 sm:text-base"
+            placeholder="Describe your changes… (Ctrl+Enter to send)"
+            rows={2}
+            onChange={(e) => setInput(e.target.value)}
+            value={input}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault()
+                handleSend()
+              }
+            }}
+          />
+          <Button
+            className="shrink-0"
+            onClick={handleSend}
+            disabled={loading || !input.trim()}
+            aria-label="Send message"
+          >
+            {loading ? <Loader2Icon className="animate-spin" /> : <ArrowUp />}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

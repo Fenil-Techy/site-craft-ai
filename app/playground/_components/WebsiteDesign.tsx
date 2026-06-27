@@ -9,11 +9,15 @@ import { useParams, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { hasWatermark } from '@/config/features';
 
 type Props = {
     generatedCode: string,
     screenSize: string,
-    isPro: boolean
+    /** User's current tier — determines watermark visibility */
+    tier: string,
+    /** Controlled by the header toggle button */
+    liveEditorEnabled: boolean,
 }
 
 const HTML_CODE = `
@@ -45,7 +49,7 @@ const HTML_CODE = `
       </html>
     `
 
-function WebsiteDesign({ generatedCode, screenSize, isPro }: Props) {
+function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: Props) {
    
     
     const [selectedElementLabel, setSelectedElementLabel] = useState<string>("No component selected")
@@ -201,12 +205,15 @@ function WebsiteDesign({ generatedCode, screenSize, isPro }: Props) {
 
         clearSelectionRef.current = clearSelection;
 
-        doc.addEventListener("mouseover", handleMouseOver, true);
-        doc.addEventListener("mouseout", handleMouseOut, true);
-        doc.addEventListener("click", handleClick, true);
-        doc?.addEventListener("keydown", handleKeyDown);
+        // Only attach interaction handlers when live editor is enabled
+        if (liveEditorEnabled) {
+            doc.addEventListener("mouseover", handleMouseOver, true);
+            doc.addEventListener("mouseout", handleMouseOut, true);
+            doc.addEventListener("click", handleClick, true);
+            doc?.addEventListener("keydown", handleKeyDown);
+        }
 
-        // Cleanup on unmount
+        // Cleanup on unmount or when liveEditorEnabled changes
         return () => {
             clearSelection();
             doc.removeEventListener("mouseover", handleMouseOver, true);
@@ -214,7 +221,7 @@ function WebsiteDesign({ generatedCode, screenSize, isPro }: Props) {
             doc.removeEventListener("click", handleClick, true);
             doc?.removeEventListener("keydown", handleKeyDown);
         };
-    }, []);
+    }, [liveEditorEnabled]);
 
 
 
@@ -232,7 +239,8 @@ function WebsiteDesign({ generatedCode, screenSize, isPro }: Props) {
                     .replaceAll("```", "")
                     .replace("html", "") ?? "";
 
-            if (!isPro && codeToRender && !codeToRender.includes("CraftPortfolio")) {
+            // Watermark: shown for free + pro, hidden for elite
+            if (hasWatermark(tier) && codeToRender && !codeToRender.includes("CraftPortfolio")) {
               codeToRender += `
   <!-- CraftPortfolio Watermark -->
   <div class="w-full text-center py-8 text-xs text-zinc-500/60 border-t border-zinc-100/10 mt-12 bg-transparent pointer-events-auto">
@@ -244,7 +252,7 @@ function WebsiteDesign({ generatedCode, screenSize, isPro }: Props) {
             }
             root.innerHTML = codeToRender;
         }
-    }, [generatedCode, clearSelectedElement, isPro]);
+    }, [generatedCode, clearSelectedElement, tier]);
 
     useEffect(()=>{
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions, react-hooks/immutability

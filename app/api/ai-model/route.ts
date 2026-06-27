@@ -1,6 +1,6 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { AI_MODELS } from "@/config/models";
-import { isModelAllowed } from "@/config/features";
+import { isModelAllowed, isUpgradedTier } from "@/config/features";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { NextRequest } from "next/server";
 import { getOrCreateUser } from "@/lib/user-helper";
@@ -42,8 +42,8 @@ export async function POST(req: NextRequest) {
 
     // Gated model authorization check
     const { has } = await auth();
-    const isPro = has({ plan: "pro" }) || dbUser.tier === "pro";
-    if (!isModelAllowed(dbUser.tier, model) && !isPro) {
+    const isUpgraded = has({ plan: "pro" }) || isUpgradedTier(dbUser.tier);
+    if (!isModelAllowed(dbUser.tier, model) && !isUpgraded) {
       return new Response(
         JSON.stringify({ error: "Forbidden: Upgrade to Pro to use premium models." }),
         { status: 403, headers: { "Content-Type": "application/json" } }
@@ -65,6 +65,105 @@ export async function POST(req: NextRequest) {
     }
     if (!fallbackChain.includes("qwen/qwen3-235b-a22b-2507")) {
       fallbackChain.push("qwen/qwen3-235b-a22b-2507");
+    }
+
+    let mode: "code" | "chat" = "chat";
+    let classificationSuccess = false;
+    const isStream = stream !== false;
+
+    if (isStream) {
+      const lastUserMsg = messages[messages.length - 1]?.content || "";
+      const classificationMessages = [
+        {
+          role: "system",
+          content: `You are a triage assistant for a website building platform.
+Analyze the user's message and determine if they want to:
+1. Generate, design, update, modify, style, or edit a website portfolio, or write HTML/CSS code (response: CODE)
+2. Just chat, ask a general question, explain something, or talk without modifying the website code (response: CHAT)
+
+Output EXACTLY 'CODE' or 'CHAT' (no formatting, no markdown, no other words).`
+        },
+        {
+          role: "user",
+          content: lastUserMsg
+        }
+      ];
+
+      // Try classifying using the fallback chain
+      for (const currentModel of fallbackChain) {
+        try {
+          console.log(`[AI_CLASSIFICATION] Attempting classification with model: ${currentModel}`);
+          const classResponse = await fetch(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: currentModel,
+                messages: classificationMessages,
+                stream: false,
+                max_tokens: 10,
+                temperature: 0,
+              }),
+            }
+          );
+
+          if (classResponse.ok) {
+            const data = await classResponse.json();
+            const classificationText = data.choices?.[0]?.message?.content?.trim().toUpperCase() || "";
+            console.log(`[AI_CLASSIFICATION] Result for "${lastUserMsg.substring(0, 40)}": ${classificationText}`);
+            if (classificationText.includes("CODE")) {
+              mode = "code";
+              classificationSuccess = true;
+              break;
+            } else if (classificationText.includes("CHAT")) {
+              mode = "chat";
+              classificationSuccess = true;
+              break;
+            }
+          } else {
+            const errText = await classResponse.text();
+            console.warn(`[AI_CLASSIFICATION_FALLBACK] Failed model ${currentModel}. Status: ${classResponse.status}, Error: ${errText}`);
+          }
+        } catch (err) {
+          console.warn(`[AI_CLASSIFICATION_FALLBACK] Request error for ${currentModel}. Error:`, err);
+        }
+      }
+
+      // Local heuristic fallback if classification failed
+      if (!classificationSuccess) {
+        const lastUserMessageLower = lastUserMsg.toLowerCase();
+        const codeKeywords = ["create", "design", "make", "build", "update", "change", "add", "remove", "style", "color", "layout", "button", "section", "hero", "portfolio", "website", "page", "html", "css", "theme"];
+        const matchesKeyword = codeKeywords.some(keyword => lastUserMessageLower.includes(keyword));
+        const hasExistingCode = messages.some((m: any) => m.role === "assistant" && m.content.includes("<"));
+        if (!hasExistingCode || matchesKeyword) {
+          mode = "code";
+        } else {
+          mode = "chat";
+        }
+        console.log(`[AI_CLASSIFICATION_HEURISTIC] Fallback determined mode: ${mode}`);
+      }
+
+      // Modify the system prompt to apply strict output guidelines for the classified mode
+      const modeDirective = mode === "code"
+        ? `\n\nIMPORTANT instructions for WEBSITE DESIGN MODE:
+- You MUST output ONLY the HTML body content.
+- Do NOT wrap the HTML in markdown code blocks or fences (do not use \`\`\`html or \`\`\`).
+- Do NOT output \`[[MODE:CODE]]\` or any other tags/markers.
+- Do NOT write any explanations, comments, introduction, or text outside of the HTML code.
+- Ensure the HTML is complete, clean, and starts directly with the first HTML tag (e.g. <div or <main).`
+        : `\n\nIMPORTANT instructions for CHAT MODE:
+- You MUST respond in plain text or markdown for a normal conversation.
+- Do NOT output \`[[MODE:CHAT]]\` or any other tags/markers.
+- Do NOT write or output any HTML code or website layout code.`;
+
+      const systemPromptIndex = messages.findIndex((m: any) => m.role === "system");
+      if (systemPromptIndex !== -1) {
+        messages[systemPromptIndex].content += modeDirective;
+      }
     }
 
     let response: Response | null = null;
@@ -162,7 +261,7 @@ export async function POST(req: NextRequest) {
               userId: dbUser.id,
               model: usedModel,
               durationMs,
-              mode: "stream",
+              mode: mode,
             });
           } catch (logErr) {
             console.error("[ANALYTICS_ERROR] Failed to log generation:", logErr);
@@ -176,6 +275,8 @@ export async function POST(req: NextRequest) {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
+        "x-generation-mode": mode,
+        "Access-Control-Expose-Headers": "x-generation-mode",
       },
     });
   } catch (error) {

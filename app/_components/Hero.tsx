@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { AI_MODELS } from '@/config/models';
+import { isUpgradedTier } from '@/config/features';
 import Image from 'next/image';
 
 function Hero() {
@@ -37,7 +38,7 @@ function Hero() {
   const { userDetail, setUserDetail } = context
   const { has } = useAuth()
   const hasUnlimitedAcess = has ? has({ plan: 'pro' }) : false
-  const isPro = hasUnlimitedAcess || userDetail?.tier === 'pro';
+  const isPro = hasUnlimitedAcess || isUpgradedTier(userDetail?.tier);
 
   const CreateNewProject = async () => {
     // Model Gating Check

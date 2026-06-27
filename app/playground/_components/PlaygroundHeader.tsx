@@ -4,8 +4,9 @@ import { OnSaveContext } from '@/context/OnSaveContext'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useContext, useEffect, useMemo, useState } from 'react'
-import { Download, MonitorIcon, Smartphone, SquareArrowOutUpRightIcon, Code2Icon, Save } from 'lucide-react'
+import { Download, MonitorIcon, Smartphone, SquareArrowOutUpRightIcon, Code2Icon, Save, MousePointer2, MousePointer2Off } from 'lucide-react'
 import { ViewCodeBlock } from './ViewCodeBlock'
+import { hasWatermark } from '@/config/features'
 
 const HTML_CODE = `<!DOCTYPE html>
       <html lang="en">
@@ -51,7 +52,18 @@ const HTML_CODE = `<!DOCTYPE html>
 {code}
 
       </html>`
-function PlaygroundHeader({ screenSize, setScreenSize, code, isPro }: any) {
+
+type PlaygroundHeaderProps = {
+  screenSize: string
+  setScreenSize: (size: string) => void
+  code: string
+  tier: string
+  /** Controlled from parent — whether the live editor is active */
+  liveEditorEnabled: boolean
+  onToggleLiveEditor: () => void
+}
+
+function PlaygroundHeader({ screenSize, setScreenSize, code, tier, liveEditorEnabled, onToggleLiveEditor }: PlaygroundHeaderProps) {
   const context = useContext(OnSaveContext)
   if (!context) throw new Error('OnSaveContext not provided')
   const { onSave, setOnSave } = context
@@ -64,14 +76,15 @@ function PlaygroundHeader({ screenSize, setScreenSize, code, isPro }: any) {
       return () => clearTimeout(timer)
     }
   }, [onSave])
+
   const finalCode = useMemo(() => {
     let cleanCode = (HTML_CODE.replace("{code}", code) || "")
       .replaceAll("```html", "")
       .replaceAll("```", "")
       .replace("html", "");
 
-    // Enforce watermark on Free tier if not already present
-    if (!isPro && !cleanCode.includes("CraftPortfolio")) {
+    // Enforce watermark: free and pro show it, elite does not
+    if (hasWatermark(tier) && !cleanCode.includes("CraftPortfolio")) {
       const watermarkHtml = `
   <!-- CraftPortfolio Watermark -->
   <div class="w-full text-center py-8 text-xs text-zinc-500/60 border-t border-zinc-100/10 mt-12 bg-transparent pointer-events-auto">
@@ -87,15 +100,15 @@ function PlaygroundHeader({ screenSize, setScreenSize, code, isPro }: any) {
       }
     }
     return cleanCode;
-  }, [code, isPro]);
+  }, [code, tier]);
+
   const ViewInNewTab = () => {
     if (!finalCode) return
-
-
     const blob = new Blob([finalCode || ""], { type: "text/html" })
     const url = URL.createObjectURL(blob)
     window.open(url, "_blank")
   }
+
   const downloadButton = () => {
     const blob = new Blob([finalCode || ""], { type: "text/html" })
     const url = URL.createObjectURL(blob)
@@ -106,12 +119,13 @@ function PlaygroundHeader({ screenSize, setScreenSize, code, isPro }: any) {
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
-
   }
+
   const handleSaveTrigger = () => {
     setIsSaving(true)
     setOnSave(Date.now())
   }
+
   return (
     <header className="sticky top-0 z-50 flex h-14 items-center justify-between border-b bg-background/90 backdrop-blur-md px-2 sm:px-4 md:p-8">
 
@@ -127,7 +141,6 @@ function PlaygroundHeader({ screenSize, setScreenSize, code, isPro }: any) {
           />
 
           <h2 className="hidden md:block text-lg font-bold">
-            
             <span className="text-blue-400 lg:text-xl">Craft</span>
             <span className="text-purple-400 lg:text-xl">Portfolio</span>
           </h2>
@@ -147,6 +160,37 @@ function PlaygroundHeader({ screenSize, setScreenSize, code, isPro }: any) {
           </Button>
         </div>
 
+        {/* Live Editor Toggle — available to all users */}
+        <Button
+          size="sm"
+          variant={liveEditorEnabled ? "default" : "outline"}
+          onClick={onToggleLiveEditor}
+          className={`hidden sm:flex gap-1.5 transition-all ${
+            liveEditorEnabled
+              ? "bg-blue-600 hover:bg-blue-500 text-white border-blue-600"
+              : "border-slate-800 text-slate-300 hover:bg-slate-900"
+          }`}
+          aria-label="Toggle live editor"
+          title={liveEditorEnabled ? "Live editor ON — click to disable" : "Live editor OFF — click to enable"}
+        >
+          {liveEditorEnabled
+            ? <MousePointer2 className="h-3.5 w-3.5" />
+            : <MousePointer2Off className="h-3.5 w-3.5" />
+          }
+          {liveEditorEnabled ? "Editor On" : "Editor Off"}
+        </Button>
+
+        {/* Live editor icon-only on mobile */}
+        <Button
+          size="icon"
+          variant={liveEditorEnabled ? "default" : "outline"}
+          onClick={onToggleLiveEditor}
+          className={`sm:hidden ${liveEditorEnabled ? "bg-blue-600 text-white" : "border-slate-800 text-slate-300"}`}
+          aria-label="Toggle live editor"
+        >
+          {liveEditorEnabled ? <MousePointer2 className="h-4 w-4" /> : <MousePointer2Off className="h-4 w-4" />}
+        </Button>
+
         <Button
           size="icon"
           variant="outline"
@@ -165,6 +209,7 @@ function PlaygroundHeader({ screenSize, setScreenSize, code, isPro }: any) {
           <SquareArrowOutUpRightIcon className="h-4 w-4" />
           View
         </Button>
+
         <ViewCodeBlock code={finalCode}>
           <div>
             <Button size="icon" variant="outline" className="sm:hidden border-slate-800 text-slate-300">
@@ -215,8 +260,6 @@ function PlaygroundHeader({ screenSize, setScreenSize, code, isPro }: any) {
         >
           <Save className={`h-3.5 w-3.5 ${isSaving ? "animate-spin" : ""}`} />
           {isSaving ? "Saving..." : "Save"}
-          
-         
         </Button>
 
       </div>

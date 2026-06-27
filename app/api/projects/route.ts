@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { v4 as uuidv4 } from "uuid";
 import { getOrCreateUser } from "@/lib/user-helper";
+import { isUpgradedTier } from "@/config/features";
 
 export async function POST(req: NextRequest) {
   try {
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     // 3. Evaluate Clerk tier status
     const { has } = await auth();
-    const hasUnlimitedAccess = has({ plan: "pro" }) || dbUser.tier === "pro";
+    const hasUnlimitedAccess = has({ plan: "pro" }) || isUpgradedTier(dbUser.tier);
 
     // 4. Handle Credits check securely WITHOUT db.transaction
     if (!hasUnlimitedAccess) {

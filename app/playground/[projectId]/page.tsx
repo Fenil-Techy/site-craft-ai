@@ -5,7 +5,6 @@ import { useEffect, useRef, useState, useContext } from 'react'
 import PlaygroundHeader from '../_components/PlaygroundHeader'
 import ChatSection from '../_components/ChatSection'
 import WebsiteDesign from '../_components/WebsiteDesign'
-// import SettingSection from '../_components/SettingSection'
 import { useParams, useSearchParams } from 'next/navigation'
 import axios from 'axios'
 import { toast } from 'sonner'
@@ -15,6 +14,7 @@ import { buildSystemPrompt } from '@/config/prompts'
 import { buildContextWindow } from '@/lib/context-manager'
 import UserDetailContext from '@/context/UserDetailContext'
 import { useAuth } from '@clerk/nextjs'
+import { isUpgradedTier, hasUnlimitedChat } from '@/config/features'
 
 export type Messages = {
   role: string,
@@ -32,11 +32,17 @@ function Playground() {
   const userDetail = context?.userDetail
   const { has } = useAuth()
   const hasUnlimitedAccess = has ? has({ plan: 'pro' }) : false
-  const isPro = hasUnlimitedAccess || userDetail?.tier === 'pro'
+  // isUpgraded covers both 'pro' and 'elite'
+  const isUpgraded = hasUnlimitedAccess || isUpgradedTier(userDetail?.tier)
+  const tier = userDetail?.tier ?? 'free'
  
   const lastLengthRef = useRef(0);
+  // Guard against React StrictMode double-mount auto-triggering SendMessage twice
+  const hasGeneratedRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
+  // Live editor toggle — starts OFF so users can read their site first
+  const [liveEditorEnabled, setLiveEditorEnabled] = useState(false);
   const { projectId } = useParams()
   const params = useSearchParams()
   const frameId = params.get('frameId')
@@ -72,20 +78,24 @@ function Playground() {
       setSelectedModel(
         result.data?.selectedModel || "openai/gpt-4o-mini"
       );
+      // Guard: only auto-generate once even under React StrictMode double-mount
       if (result.data?.chatMessages?.length === 1 && !hasStoredDesignCode) {
-        const userMsg = result.data?.chatMessages[0].content
-        // eslint-disable-next-line react-hooks/immutability
-        SendMessage(
-          userMsg,
-          result.data.selectedModel
-        );
+        if (!hasGeneratedRef.current) {
+          hasGeneratedRef.current = true;
+          const userMsg = result.data?.chatMessages[0].content
+          // eslint-disable-next-line react-hooks/immutability
+          SendMessage(
+            userMsg,
+            result.data.selectedModel
+          );
+        }
       }
      
       setInitialLoading(false)
     })
 
     return () => {
-      // Intentionally not aborting to prevent React StrictMode double-mount race conditions
+      // Intentionally not aborting to prevent race conditions
     };
   }, [frameId, projectId])
 
@@ -127,7 +137,7 @@ function Playground() {
       const apiMessages = [
         {
           role: "system",
-          content: buildSystemPrompt(userInput, undefined, isPro),
+          content: buildSystemPrompt(userInput, undefined, isUpgraded),
         },
         ...(summaryMessage ? [summaryMessage] : []),
         ...(generatedCode
@@ -156,15 +166,15 @@ function Playground() {
       }
       
 
+      const modeHeader = res.headers.get("x-generation-mode");
+      const mode: "code" | "chat" = modeHeader === "code" ? "code" : "chat";
+
       const reader = res.body?.getReader();
       const decoder = new TextDecoder();
 
       let fullText = "";
       let rawResponse = "";
       let eventBuffer = "";
-      let mode: "code" | "chat" | null = null;
-
-     
 
       while (true) {
         const { done, value }: any = await reader?.read();
@@ -193,26 +203,25 @@ function Playground() {
 
             rawResponse += text;
 
-            if (!mode) {
-              const modeMatch = rawResponse.match(/^\s*\[\[MODE:(CODE|CHAT)\]\]/);
-              if (modeMatch) {
-                mode = modeMatch[1] === "CODE" ? "code" : "chat";
-              }
-            }
-
-            const cleanedText = rawResponse
-              .replace(/^\s*\[\[MODE:(?:CODE|CHAT)\]\]\s*/, "");
-            fullText = cleanedText;
-
-
-
+            let cleanedText = rawResponse;
             if (mode === "code") {
+              cleanedText = cleanedText.trimStart();
+              if (cleanedText.startsWith("```html")) {
+                cleanedText = cleanedText.slice(7).trimStart();
+              } else if (cleanedText.startsWith("```")) {
+                cleanedText = cleanedText.slice(3).trimStart();
+              }
+              if (cleanedText.endsWith("```")) {
+                cleanedText = cleanedText.slice(0, -3);
+              }
+
               // 3.6 — Only update iframe every 2000 chars to reduce re-paints (~6 updates vs ~24)
               if (cleanedText.length - lastLengthRef.current > 2000) {
                 lastLengthRef.current = cleanedText.length;
                 setGeneratedCode(cleanedText);
               }
             }
+            fullText = cleanedText;
           } catch { }
         }
       }
@@ -220,13 +229,10 @@ function Playground() {
       clearTimeout(timeoutId);
 
       if (mode === "code") {
+        if (fullText.endsWith("```")) {
+          fullText = fullText.slice(0, -3);
+        }
         setGeneratedCode(fullText);
-      }
-
-      // fallback when model misses marker
-      if (!mode) {
-        const htmlSignal = /<(main|section|div|header|footer|nav|article|aside|form|body)\b/i;
-        mode = htmlSignal.test(fullText) ? "code" : "chat";
       }
 
       // ✅ final message depends on type
@@ -286,12 +292,20 @@ function Playground() {
     toast.success("website is ready")
   }
 
+  // Free tier: block chat after the first AI response is stored
+  // messages: [user-prompt, assistant-response] = length 2 → block
+  const chatBlocked = !isUpgraded && (messages?.length ?? 0) >= 2;
+
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-background">
-      <PlaygroundHeader screenSize={screenSize}
+      <PlaygroundHeader
+        screenSize={screenSize}
         setScreenSize={(v: string) => setScreenSize(v)}
         code={generatedCode}
-        isPro={isPro} />
+        tier={tier}
+        liveEditorEnabled={liveEditorEnabled}
+        onToggleLiveEditor={() => setLiveEditorEnabled((v) => !v)}
+      />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
         {/* Desktop */}
         <div className="hidden lg:flex">
@@ -299,6 +313,7 @@ function Playground() {
             messages={messages ?? []}
             onSend={(input: string) => SendMessage(input)}
             loading={loading}
+            chatBlocked={chatBlocked}
           />
         </div>
 
@@ -362,6 +377,7 @@ function Playground() {
                     messages={messages ?? []}
                     onSend={(input: string) => SendMessage(input)}
                     loading={loading}
+                    chatBlocked={chatBlocked}
                   />
                 </div>
               </div>
@@ -369,7 +385,12 @@ function Playground() {
           )}
         </div>
         <main className="relative order-1 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden lg:order-2 lg:h-full">
-          <WebsiteDesign generatedCode={generatedCode} screenSize={screenSize} isPro={isPro} />
+          <WebsiteDesign
+            generatedCode={generatedCode}
+            screenSize={screenSize}
+            tier={tier}
+            liveEditorEnabled={liveEditorEnabled}
+          />
 
           {/* Initial DB fetch overlay */}
           {initialLoading && (

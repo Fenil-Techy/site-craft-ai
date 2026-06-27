@@ -24,6 +24,7 @@ import Link from "next/link"
 import { useContext, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { MAX_FREE_CREDITS } from "@/config/credits"
+import { isUpgradedTier } from "@/config/features"
 
 
 
@@ -41,7 +42,7 @@ export function AppSidebar() {
     const { userDetail, setUserDetail } = context
     const { has } = useAuth()
     const hasUnlimitedAcess = has ? has({ plan: 'pro' }) : false
-    const isPro = hasUnlimitedAcess || userDetail?.tier === 'pro';
+    const isPro = hasUnlimitedAcess || isUpgradedTier(userDetail?.tier);
 
     useEffect(() => {
         // 3.5 — TTL cache: treat entries older than 5 min as a miss
