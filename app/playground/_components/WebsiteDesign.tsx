@@ -71,8 +71,9 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
     }, []);
 
 
-    // Initialize iframe shell once
+    const [iframeInitialized, setIframeInitialized] = useState(false);
 
+    // Initialize iframe shell once
     useEffect(() => {
         if (!iframeRef.current) return;
         const doc = iframeRef.current.contentDocument;
@@ -81,17 +82,22 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
         doc.open();
         doc.write(HTML_CODE);
         doc.close();
+        setIframeInitialized(true);
+    }, []);
+
+    // Set up live editor event handlers
+    useEffect(() => {
+        if (!iframeInitialized || !iframeRef.current) return;
+        const doc = iframeRef.current.contentDocument;
+        if (!doc) return;
 
         let hoverEl: HTMLElement | null = null;
-
-
 
         const resolveSelectableTarget = (target: EventTarget | null): HTMLElement | null => {
             if (!target) return null;
             let element: HTMLElement | null = null;
             const nodeTarget = target as Node;
         
-            // Use nodeType checks instead of instanceof (iframe-safe across realms)
             if (nodeTarget.nodeType === 1) {
                 element = nodeTarget as HTMLElement;
             } else if (nodeTarget.nodeType === 3) {
@@ -103,7 +109,6 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
             const root = doc.getElementById("root");
             if (!root || !root.contains(element)) return null;
         
-            // 1. Check if the user directly clicked a specific interactive/content element
             const innerTarget = element.closest(
                 "button, a, img, h1, h2, h3, h4, h5, h6, p, span, li, input, textarea, label, [data-component]"
             );
@@ -111,7 +116,6 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
                 return innerTarget as HTMLElement;
             }
         
-            // 2. Fallback to larger layout wrappers if they didn't hit micro-content directly
             const semanticParent = element.closest(
                 "section, article, nav, header, footer, aside, main, form, card"
             );
@@ -185,7 +189,6 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
             target.focus();
             setSelectedElementLabel(getElementLabel(target));
             setSelectedElement(target)
-
         };
 
         const handleBlur = () => {
@@ -194,7 +197,6 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
                 console.log("Final edited element:", selectedEl.outerHTML);
             }
         };
-
 
         const handleKeyDown = (e: KeyboardEvent) => {
             const selectedEl = selectedElementRef.current;
@@ -205,29 +207,25 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
 
         clearSelectionRef.current = clearSelection;
 
-        // Only attach interaction handlers when live editor is enabled
         if (liveEditorEnabled) {
             doc.addEventListener("mouseover", handleMouseOver, true);
             doc.addEventListener("mouseout", handleMouseOut, true);
             doc.addEventListener("click", handleClick, true);
-            doc?.addEventListener("keydown", handleKeyDown);
+            doc.addEventListener("keydown", handleKeyDown);
         }
 
-        // Cleanup on unmount or when liveEditorEnabled changes
         return () => {
             clearSelection();
             doc.removeEventListener("mouseover", handleMouseOver, true);
             doc.removeEventListener("mouseout", handleMouseOut, true);
             doc.removeEventListener("click", handleClick, true);
-            doc?.removeEventListener("keydown", handleKeyDown);
+            doc.removeEventListener("keydown", handleKeyDown);
         };
-    }, [liveEditorEnabled]);
+    }, [liveEditorEnabled, iframeInitialized]);
 
-
-
-    // Update body only when code changes
+    // Update body only when code changes or iframe initializes
     useEffect(() => {
-        if (!iframeRef.current) return;
+        if (!iframeInitialized || !iframeRef.current) return;
         const doc = iframeRef.current.contentDocument;
         if (!doc) return;
 
@@ -239,7 +237,6 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
                     .replaceAll("```", "")
                     .replace("html", "") ?? "";
 
-            // Watermark: shown for free + pro, hidden for elite
             if (hasWatermark(tier) && codeToRender && !codeToRender.includes("CraftPortfolio")) {
               codeToRender += `
   <!-- CraftPortfolio Watermark -->
@@ -252,12 +249,11 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
             }
             root.innerHTML = codeToRender;
         }
-    }, [generatedCode, clearSelectedElement, tier]);
+    }, [generatedCode, clearSelectedElement, tier, iframeInitialized]);
 
     useEffect(()=>{
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions, react-hooks/immutability
         onSave && HandleOnSave()
-    },[onSave])
+    },[onSave, iframeInitialized])
 
     const HandleOnSave = async () => {
         if (iframeRef.current) {
