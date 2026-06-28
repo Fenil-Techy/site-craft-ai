@@ -163,3 +163,66 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
+export async function PUT(req: NextRequest) {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "Unauthorized access" },
+        { status: 401 }
+      );
+    }
+
+    const dbUser = await getOrCreateUser(user);
+    if (!dbUser) {
+      return NextResponse.json(
+        { error: "User profile not found" },
+        { status: 404 }
+      );
+    }
+
+    const body = await req.json();
+    const { projectId, title } = body;
+
+    if (!projectId || typeof title !== "string") {
+      return NextResponse.json(
+        { error: "Bad Request: Missing or malformed parameters" },
+        { status: 400 }
+      );
+    }
+
+    // Verify ownership
+    const project = await db
+      .select()
+      .from(projectTable)
+      .where(
+        and(
+          eq(projectTable.projectId, projectId),
+          eq(projectTable.createdBy, dbUser.id)
+        )
+      );
+
+    if (project.length === 0) {
+      return NextResponse.json(
+        { error: "Project not found or unauthorized" },
+        { status: 404 }
+      );
+    }
+
+    // Update title
+    await db
+      .update(projectTable)
+      .set({ title })
+      .where(eq(projectTable.projectId, projectId));
+
+    return NextResponse.json({ success: true, title }, { status: 200 });
+
+  } catch (error) {
+    console.error("[PROTECTED_PROJECTS_PUT_ERROR]:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
+}

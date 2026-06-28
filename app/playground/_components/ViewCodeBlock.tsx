@@ -1,15 +1,15 @@
 'use client'
 
 import dynamic from 'next/dynamic';
-import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog"
-import { Copy } from "lucide-react";
+import { Copy, X } from "lucide-react";
 import { toast } from "sonner";
 
 // 3.3 — Lazy-load the ~70KB syntax highlighter only when the dialog opens.
@@ -45,6 +45,7 @@ export function ViewCodeBlock({ children, code }: Props) {
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent
+        showCloseButton={false}
         className="
           w-[95vw]
           max-w-[95vw]
@@ -62,11 +63,53 @@ export function ViewCodeBlock({ children, code }: Props) {
       >
         {/* Header */}
         <DialogHeader className="flex flex-row items-center justify-between border-b px-4 py-3 shrink-0">
-          <DialogTitle>Source Code</DialogTitle>
+          <DialogTitle className="text-sm font-semibold text-zinc-100">Source Code</DialogTitle>
 
-          <Button size="icon" variant="outline" onClick={handleCopy} aria-label="Copy code to clipboard">
-            <Copy className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Copy Button */}
+            <button
+              onClick={handleCopy}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all duration-100 cursor-pointer"
+              style={{
+                borderColor: 'var(--color-border-base)',
+                color: 'var(--color-text-secondary)',
+                backgroundColor: 'transparent',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-bg-surface)';
+                (e.currentTarget as HTMLElement).style.color = 'var(--color-text-primary)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                (e.currentTarget as HTMLElement).style.color = 'var(--color-text-secondary)';
+              }}
+            >
+              <Copy className="h-3.5 w-3.5" />
+              Copy Code
+            </button>
+
+            {/* Cancel / Close Button */}
+            <DialogClose asChild>
+              <button
+                className="flex items-center justify-center w-8 h-8 rounded-lg border transition-all duration-100 cursor-pointer"
+                style={{
+                  borderColor: 'var(--color-border-base)',
+                  color: 'var(--color-text-secondary)',
+                  backgroundColor: 'transparent',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-bg-surface)';
+                  (e.currentTarget as HTMLElement).style.color = 'var(--color-text-primary)';
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                  (e.currentTarget as HTMLElement).style.color = 'var(--color-text-secondary)';
+                }}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </DialogClose>
+          </div>
         </DialogHeader>
 
         {/* Body */}

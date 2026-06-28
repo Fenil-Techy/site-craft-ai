@@ -46,6 +46,7 @@ function Playground() {
   const { projectId } = useParams()
   const params = useSearchParams()
   const frameId = params.get('frameId')
+  const [projectTitle, setProjectTitle] = useState("Untitled Project");
   const [frameDetail, setFrameDetail] = useState<Frame>()
   const [loading, setLoading] = useState(false)
   const [generatedCode, setGeneratedCode] = useState<string>("")
@@ -58,7 +59,7 @@ function Playground() {
     if (!frameId) return
     setInitialLoading(true);
     void axios.get(`/api/frames?frameId=${frameId}&projectId=${projectId}`).then((result) => {
-      
+      setProjectTitle(result.data?.projectTitle || "Untitled Project")
       setFrameDetail(result.data)
       const designCode = result.data?.designCode;
       const hasStoredDesignCode =
@@ -284,6 +285,32 @@ function Playground() {
   
 
 
+  const handleUpdateTitle = async (newTitle: string) => {
+    setProjectTitle(newTitle);
+    try {
+      await axios.put("/api/projects", {
+        projectId,
+        title: newTitle,
+      });
+      try {
+        const raw = localStorage.getItem("projects");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed.data)) {
+            const updated = parsed.data.map((p: any) =>
+              p.projectId === projectId ? { ...p, title: newTitle } : p
+            );
+            localStorage.setItem("projects", JSON.stringify({ ...parsed, data: updated }));
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    } catch (error) {
+      toast.error("Failed to update project title");
+    }
+  };
+
   const SaveGeneratedCode = async (code: string) => {
     const result = await axios.put("/api/frames", {
       designCode: code,
@@ -306,6 +333,8 @@ function Playground() {
         tier={tier}
         liveEditorEnabled={liveEditorEnabled}
         onToggleLiveEditor={() => setLiveEditorEnabled((v) => !v)}
+        projectTitle={projectTitle}
+        onUpdateTitle={handleUpdateTitle}
       />
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
         {/* Desktop */}

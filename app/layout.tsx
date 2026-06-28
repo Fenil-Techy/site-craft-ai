@@ -1,18 +1,19 @@
 import { TooltipProvider } from "@/components/ui/tooltip"
 import type { Metadata } from "next";
 import { ClerkProvider } from '@clerk/nextjs'
-import { dark } from '@clerk/ui/themes' // 1. Import the dark theme base
-import { Poppins } from "next/font/google";
+import { dark } from '@clerk/ui/themes'
+import { Inter } from "next/font/google";
 import "./globals.css";
 import Provider from "./provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
-const poppins = Poppins({
-  variable: "--font-poppins",
+
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  display:'swap'
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -52,64 +53,46 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${poppins.className} antialiased text-slate-100 bg-slate-950`}>
+      <body className={`${inter.variable} font-sans antialiased`} style={{backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)'}}>
       <ClerkProvider
-  appearance={{
+    appearance={{
     theme: dark,
     variables: {
-      colorPrimary: '#8b5cf6', // Vibrant Purple (violet-500) for active states/accents
+      colorPrimary: '#fbbf24',
+      colorBackground: '#0d0d0d',
+      colorInputBackground: '#141414',
+      colorText: '#fafaf9',
+      colorTextSecondary: '#a8a29e',
+      colorNeutral: '#1c1c1c',
+      borderRadius: '8px',
     },
     elements: {
-      // Main card container
-      card: 
-        "bg-[#0b0f19] border border-slate-800/80 shadow-xl shadow-purple-500/5 backdrop-blur-md text-slate-100",
-        
-        // Text color overrides
-        headerTitle: "text-slate-100",
-        headerSubtitle: "text-slate-400",
-        formFieldLabel: "text-slate-300 font-medium",
-        footerActionText: "text-slate-400",
-        footerActionLink: "text-purple-400 hover:text-purple-300",
-      
-        // Input field styles
-        formFieldInput: 
-        "bg-slate-900 border-slate-800 text-slate-100 focus:border-purple-500 focus:ring-purple-500",
-        
-        // Social button styles (Google, GitHub, etc.)
-        socialButtonsBlockButton:
-        "bg-slate-900/50 border border-slate-800 hover:bg-slate-900 hover:border-purple-500/50 transition-all duration-200",
-        
-        socialButtonsBlockButtonText:
-        "!text-slate-200 font-medium",
-        
-        socialButtonsProviderIcon:
-        "opacity-100 filter drop-shadow-[0_0_4px_rgba(139,92,246,0.2)]",
-      
-      // Divider styles
-      dividerLine:
-        "bg-gradient-to-r from-transparent via-slate-800 to-transparent",
-        
-        dividerText:
-        "text-slate-400 font-medium text-xs tracking-wider uppercase",
-        
-        // User Profile Button & Popover styles
-        userButtonPopoverCard: 
-        "bg-[#0b0f19] border border-slate-800/80 shadow-lg shadow-purple-500/5",
-        
-        userButtonPopoverActionButton:
-        "text-slate-200 hover:bg-purple-950/30 hover:text-purple-300 transition-colors",
-        
-        userButtonPopoverActionButtonText:
-        "!text-slate-200 group-hover:text-purple-300",
-        
-        userButtonPopoverFooter:
-        "bg-[#070a10] border-t border-slate-800/80",
-        
-        // Primary Action Button styles (Sign In / Sign Up)
-        formButtonPrimary: 
-        "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 transform active:scale-[0.98] transition-all text-white font-semibold shadow-md shadow-purple-500/10",
-      },
-    }}
+      card:
+        "bg-[#141414] border border-white/6 shadow-xl backdrop-blur-md",
+      headerTitle: "text-[#fafaf9] font-semibold",
+      headerSubtitle: "text-[#a8a29e]",
+      formFieldLabel: "text-[#a8a29e] font-medium text-sm",
+      footerActionText: "text-[#a8a29e]",
+      footerActionLink: "text-[#fbbf24] hover:text-[#fcd34d]",
+      formFieldInput:
+        "bg-[#0d0d0d] border border-white/6 text-[#fafaf9] focus:border-[#fbbf24] rounded-lg",
+      socialButtonsBlockButton:
+        "bg-[#1c1c1c] border border-white/6 hover:bg-[#262626] hover:border-[#fbbf24]/30 transition-all duration-200",
+      socialButtonsBlockButtonText: "!text-[#fafaf9] font-medium",
+      dividerLine: "bg-white/6",
+      dividerText: "text-[#57534e] font-medium text-xs tracking-wider uppercase",
+      userButtonPopoverCard:
+        "bg-[#141414] border border-white/6 shadow-lg",
+      userButtonPopoverActionButton:
+        "text-[#fafaf9] !text-[#fafaf9] hover:bg-[#fbbf24]/10 transition-colors",
+      userButtonPopoverActionButtonText: "text-[#fafaf9] !text-[#fafaf9] font-medium",
+      userButtonPopoverActionButtonIcon: "text-[#fafaf9] !text-[#fafaf9] opacity-70",
+      userButtonPopoverFooter:
+        "bg-[#0d0d0d] border-t border-white/6",
+      formButtonPrimary:
+        "bg-[#fbbf24] hover:bg-[#fcd34d] text-[#0d0d0d] font-semibold shadow-lg transition-all active:scale-[0.98]",
+    },
+  }}
 >
           <Provider>
             <TooltipProvider>

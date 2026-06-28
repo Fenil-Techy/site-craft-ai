@@ -76,6 +76,7 @@ export async function GET(req: NextRequest) {
         ...frameResult[0],
         chatMessages,
         selectedModel: projectResult[0]?.selectedModel,
+        projectTitle: projectResult[0]?.title || "Untitled Project",
     }
 
     return NextResponse.json(finalResult)

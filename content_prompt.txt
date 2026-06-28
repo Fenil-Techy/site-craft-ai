@@ -1,0 +1,214 @@
+You are a Senior Product Designer, UX Writer, CRO (Conversion Rate Optimization) Specialist, SaaS Growth Designer, and Brand Strategist.
+
+Do NOT redesign the UI yet.
+
+First, analyze the entire application from a content, messaging, and user experience perspective.
+
+Assume the product functionality already exists.
+
+Your goal is to identify what CONTENT, copy, trust signals, educational sections, and micro-interactions are missing that would make this feel like a premium, high-converting SaaS product.
+
+==================================
+CONTENT & UX ANALYSIS
+=====================
+
+Analyze every page and identify:
+
+• Missing sections
+• Weak copy
+• Empty areas
+• Opportunities to educate users
+• Opportunities to build trust
+• Opportunities to increase engagement
+• Opportunities to improve clarity
+• Opportunities to improve perceived product value
+
+Do not suggest new core features.
+
+Instead, suggest content improvements around the existing product.
+
+==================================
+LANDING PAGE
+============
+
+Analyze whether the landing page contains everything expected from a modern AI SaaS.
+
+Suggest additions such as:
+
+• Better hero copy
+• Stronger headline
+• Better subheadline
+• CTA improvements
+• Feature highlights
+• Benefits instead of features
+• Problem → Solution storytelling
+• How it works section
+• Interactive preview section
+• Live product showcase
+• Portfolio examples
+• Template showcase
+• AI workflow explanation
+• Why choose us
+• Comparison section
+• Before vs After example
+• Testimonials (placeholder if needed)
+• User success stories
+• Social proof
+• Trusted by section
+• FAQ
+• Security & Privacy section
+• AI capabilities section
+• Technology stack section
+• Supported platforms
+• Call-to-action sections
+• Footer improvements
+
+For each missing section explain:
+
+* Why it matters
+* What content should be included
+* Where it should appear
+* Priority (High / Medium / Low)
+
+==================================
+DASHBOARD
+=========
+
+Analyze what informational content could improve the dashboard.
+
+Examples:
+
+• Welcome messages
+• Progress summaries
+• Empty state guidance
+• Quick tips
+• Productivity hints
+• Contextual help
+• Recent activity
+• Portfolio completion indicators
+• Helpful onboarding cards
+• Achievement messages
+
+==================================
+PORTFOLIO BUILDER
+=================
+
+Suggest improvements to:
+
+• Instructions
+• Helper text
+• Empty states
+• AI guidance
+• Placeholder text
+• Step descriptions
+• Progress messaging
+• Success messages
+• Validation messages
+• Publishing guidance
+
+Make the experience feel reassuring and premium.
+
+==================================
+MICROCOPY
+=========
+
+Review all text across the project.
+
+Find:
+
+• Generic button labels
+• Weak headings
+• Robotic copy
+• Confusing wording
+• Long paragraphs
+• Missing helper text
+• Missing tooltips
+• Missing onboarding text
+• Missing confirmation messages
+• Missing success messages
+• Missing empty state messages
+
+Rewrite them to sound:
+
+Professional
+
+Friendly
+
+Modern
+
+Confident
+
+Premium
+
+Clear
+
+Concise
+
+==================================
+TRUST & CREDIBILITY
+===================
+
+Identify where trust can be increased.
+
+Suggest content like:
+
+• Privacy reassurance
+• AI transparency
+• Data security messaging
+• Auto-save indicators
+• Portfolio ownership statements
+• Publishing confidence
+• Customer support messaging
+• Quality guarantees
+
+==================================
+PREMIUM DETAILS
+===============
+
+Identify every small detail that premium SaaS products include but this project is missing.
+
+Examples:
+
+• Better onboarding copy
+• Keyboard shortcut hints
+• Helpful tooltips
+• Contextual guidance
+• Loading messages
+• Empty illustrations
+• Success celebrations
+• Encouragement messages
+• Progress indicators
+• Smart recommendations
+• Time-saving tips
+• Friendly confirmations
+• Informative placeholders
+• Section descriptions
+• Better page introductions
+• Smart callouts
+• Context cards
+• AI tips
+• Best practices
+• Inspirational examples
+
+==================================
+OUTPUT FORMAT
+=============
+
+Produce a structured report.
+
+For every page provide:
+
+1. Current content evaluation
+2. Missing sections
+3. Missing microcopy
+4. Missing trust signals
+5. Missing educational content
+6. Missing helper text
+7. Missing empty states
+8. Missing success states
+9. Suggested premium improvements
+10. Priority level
+
+Finally create a "Premium SaaS Enhancement Checklist" containing every small improvement that should be added before considering the application production-ready.
+
+Think like a Product Designer, UX Writer, Marketing Strategist, and Conversion Optimization expert—not just a UI designer.

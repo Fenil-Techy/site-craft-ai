@@ -1,76 +1,58 @@
 'use client'
 import React, { useState } from 'react'
 import Header from '../_components/Header'
-import { Button } from '@/components/ui/button'
-import { Check, Zap, Crown, Sparkles, Loader2 } from 'lucide-react'
+import { Check, Crown, Loader2, Sparkles, Zap } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUser, SignInButton } from '@clerk/nextjs'
 import Script from 'next/script'
 
+// Test plan intentionally excluded from the public PLANS array
 const PLANS = [
-  {
-    id: "test",
-    name: "Test ₹1",
-    price: "1",
-    period: "one-time",
-    description: "For live payment testing only.",
-    credits: 1,
-    icon: Zap,
-    iconColor: "text-emerald-400",
-    features: [
-      "1 credit (test only)",
-      "Verifies full payment flow",
-      "Not for production use",
-    ],
-    buttonText: "Pay ₹1 to Test",
-    gradient: "from-emerald-950/40 to-zinc-950",
-    borderClass: "border-emerald-500/30 border-dashed",
-    accentColor: "bg-emerald-700",
-    popular: false,
-  },
   {
     id: "free",
     name: "Free",
     price: "0",
     period: "forever",
-    description: "Try it out. No card needed.",
+    description: "Try it — no card needed.",
     credits: 2,
     icon: Zap,
-    iconColor: "text-zinc-400",
     features: [
       "2 portfolio generations",
-      "Watermark on output",
+      "All design templates",
       "Basic AI model",
-      "No live editor",
-      "One-time chat update",
+      "Instant preview",
+    ],
+    excluded: [
+      "Live editor",
+      "Watermark-free output",
+      "Priority support",
     ],
     buttonText: "Current Plan",
-    gradient: "from-zinc-900 to-zinc-950",
-    borderClass: "border-zinc-800",
-    accentColor: "bg-zinc-700",
-    popular: false,
+    isFree: true,
+    isPopular: false,
+    accentClass: 'free',
   },
   {
     id: "pro",
     name: "Pro",
     price: "799",
     period: "one-time",
-    description: "For creators who need more generations.",
+    description: "For creators who ship regularly.",
     credits: 50,
     icon: Sparkles,
-    iconColor: "text-blue-400",
     features: [
       "50 portfolio generations",
-      "Watermark on output",
       "All AI models",
       "Live editor",
       "Priority support",
     ],
+    excluded: [
+      "Watermark-free output",
+    ],
     buttonText: "Get Pro",
-    gradient: "from-blue-950/50 to-zinc-950",
-    borderClass: "border-blue-500/30",
-    accentColor: "bg-blue-600",
-    popular: false,
+    isFree: false,
+    isPopular: false,
+    accentClass: 'pro',
   },
   {
     id: "elite",
@@ -80,89 +62,66 @@ const PLANS = [
     description: "White-label quality. Zero compromise.",
     credits: 200,
     icon: Crown,
-    iconColor: "text-purple-400",
     features: [
       "200 portfolio generations",
-      "No watermark",
+      "Watermark-free output",
       "All AI models",
       "Live editor",
       "Priority support",
     ],
+    excluded: [],
     buttonText: "Get Elite",
-    gradient: "from-purple-950/50 to-zinc-950",
-    borderClass: "border-purple-500/40",
-    accentColor: "bg-purple-600",
-    popular: true,
+    isFree: false,
+    isPopular: true,
+    accentClass: 'elite',
   },
-];
+]
 
 declare global {
-  interface Window {
-    Razorpay: any;
-  }
+  interface Window { Razorpay: any; }
 }
 
 function Pricing() {
-  const { user, isLoaded } = useUser();
-  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const { user, isLoaded } = useUser()
+  const [loadingId, setLoadingId] = useState<string | null>(null)
 
   const handleCheckout = async (planId: string) => {
-    if (planId === "free") return;
-
+    if (planId === "free") return
     if (!user) {
-      toast.error("Please sign in to continue.");
-      return;
+      toast.error("Please sign in to continue.")
+      return
     }
-
     if (!window.Razorpay) {
-      toast.error("Payment SDK not loaded. Please refresh and try again.");
-      return;
+      toast.error("Payment SDK not loaded. Please refresh and try again.")
+      return
     }
-
     try {
-      setLoadingId(planId);
-
-      // Step 1: Create order on backend
+      setLoadingId(planId)
       const res = await fetch("/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: planId }),
-      });
-
+      })
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Failed to create order");
+        const err = await res.json()
+        throw new Error(err.error || "Failed to create order")
       }
-
-      const { order_id, amount, currency } = await res.json();
-
-      const plan = PLANS.find((p) => p.id === planId)!;
-
-      // Step 2: Open Razorpay checkout modal
+      const { order_id, amount, currency } = await res.json()
+      const plan = PLANS.find((p) => p.id === planId)!
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        order_id,
-        amount,
-        currency,
+        order_id, amount, currency,
         name: "CraftPortfolio",
         description: `${plan.name} Plan — ${plan.credits} Credits`,
         prefill: {
           name: user.fullName || "",
           email: user.primaryEmailAddress?.emailAddress || "",
         },
-        theme: {
-          color: planId === "elite" ? "#9333ea" : "#3b82f6",
-        },
-        handler: async function (response: {
-          razorpay_payment_id: string;
-          razorpay_order_id: string;
-          razorpay_signature: string;
-        }) {
+        theme: { color: '#fbbf24' },
+        handler: async function (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) {
           try {
-            setLoadingId(planId);
-            toast.loading("Verifying payment...", { id: "verify" });
-
-            // Step 3: Verify signature on backend
+            setLoadingId(planId)
+            toast.loading("Verifying payment…", { id: "verify" })
             const verifyRes = await fetch("/api/payment/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -172,128 +131,174 @@ function Pricing() {
                 razorpay_signature: response.razorpay_signature,
                 plan: planId,
               }),
-            });
-
-            toast.dismiss("verify");
-
+            })
+            toast.dismiss("verify")
             if (!verifyRes.ok) {
-              const err = await verifyRes.json();
-              throw new Error(err.error || "Verification failed");
+              const err = await verifyRes.json()
+              throw new Error(err.error || "Verification failed")
             }
-
-            toast.success(`🎉 ${plan.name} plan activated! ${plan.credits} credits added.`);
-            setTimeout(() => { window.location.href = "/workspace"; }, 1500);
+            toast.success(`🎉 ${plan.name} plan activated! ${plan.credits} credits added.`)
+            setTimeout(() => { window.location.href = "/workspace" }, 1500)
           } catch (err: any) {
-            toast.error(err.message || "Payment verification failed.");
-            setLoadingId(null);
+            toast.error(err.message || "Payment verification failed.")
+            setLoadingId(null)
           }
         },
         modal: {
           ondismiss: () => {
-            toast.info("Payment cancelled.");
-            setLoadingId(null);
+            toast.info("Payment cancelled.")
+            setLoadingId(null)
           },
         },
-      };
-
-      const rzp = new window.Razorpay(options);
+      }
+      const rzp = new window.Razorpay(options)
       rzp.on("payment.failed", (response: any) => {
-        toast.error(`Payment failed: ${response.error.description}`);
-        setLoadingId(null);
-      });
-      rzp.open();
-
+        toast.error(`Payment failed: ${response.error.description}`)
+        setLoadingId(null)
+      })
+      rzp.open()
     } catch (err: any) {
-      toast.error(err.message || "Something went wrong. Please try again.");
-      setLoadingId(null);
+      toast.error(err.message || "Something went wrong. Please try again.")
+      setLoadingId(null)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-blue-500/30">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)' }}>
       <Script
         src="https://checkout.razorpay.com/v1/checkout.js"
         strategy="afterInteractive"
         onLoad={() => {
-          // Pre-initialize Razorpay as soon as checkout.js loads.
-          // This triggers background device fingerprinting (UPI app detection)
-          // so all payment options are ready before the user clicks Pay.
           if (typeof window !== "undefined" && window.Razorpay) {
             try {
-              const prefetchInstance = new window.Razorpay({
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-              });
-              // Trigger internal prefetch / UPI app detection silently
-              if (typeof prefetchInstance.prefetch === "function") {
-                prefetchInstance.prefetch();
-              }
-            } catch {
-              // Silently ignore — prefetch is best-effort
-            }
+              const prefetchInstance = new window.Razorpay({ key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID })
+              if (typeof prefetchInstance.prefetch === "function") prefetchInstance.prefetch()
+            } catch { /* silent */ }
           }
         }}
       />
       <Header />
-      <main className="relative flex flex-col items-center justify-center w-full px-4 sm:px-6 py-16 text-center overflow-hidden">
-        {/* Background glows */}
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 h-[600px] w-[600px] rounded-full bg-blue-500/8 blur-3xl pointer-events-none -z-10" />
-        <div className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-purple-500/8 blur-3xl pointer-events-none -z-10" />
 
-        <div className="max-w-4xl w-full mx-auto space-y-12">
-          {/* Header */}
-          <div className="space-y-3">
-            <h1 className="font-extrabold text-4xl sm:text-5xl tracking-tight bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Simple Pricing
+      <main className="relative flex flex-col items-center w-full px-4 sm:px-6 py-16 sm:py-24 overflow-hidden">
+        {/* Ambient glows — Saffron */}
+        <div
+          className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full -z-10"
+          style={{ background: 'radial-gradient(ellipse, rgb(251 191 36 / 8%) 0%, transparent 70%)', filter: 'blur(48px)' }}
+        />
+
+        <div className="max-w-5xl w-full mx-auto space-y-14">
+
+          {/* Page heading */}
+          <div className="text-center space-y-3">
+            <h1
+              className="text-4xl sm:text-5xl tracking-tight"
+              style={{
+                fontFamily: 'var(--font-inter, system-ui, sans-serif)',
+                fontWeight: 700,
+                letterSpacing: '-0.03em',
+                color: 'var(--color-text-primary)',
+              }}
+            >
+              Simple pricing,{' '}
+              <span style={{ color: 'var(--color-brand)' }}>
+                no surprises.
+              </span>
             </h1>
-            <p className="text-zinc-400 text-base max-w-md mx-auto">
-              Pay once, use forever. No subscriptions, no surprises.
+            <p className="text-base max-w-sm mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
+              Pay once. Credits never expire. No subscriptions.
             </p>
           </div>
 
           {/* Plan cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {PLANS.map((plan) => {
-              const Icon = plan.icon;
+              const Icon = plan.icon
+              const isElite = plan.id === 'elite'
               return (
                 <div
                   key={plan.id}
-                  className={`relative flex flex-col justify-between p-6 rounded-2xl bg-gradient-to-b ${plan.gradient} border ${plan.borderClass} transition-all duration-300 hover:scale-[1.02] shadow-xl`}
+                  className="relative flex flex-col justify-between rounded-2xl p-6 transition-all duration-200"
+                  style={{
+                    backgroundColor: isElite ? 'var(--color-bg-raised)' : 'var(--color-bg-surface)',
+                    border: isElite ? '1px solid var(--color-brand-border)' : '1px solid var(--color-border-base)',
+                    boxShadow: isElite
+                      ? 'var(--shadow-brand-lg), var(--shadow-md), var(--shadow-inner)'
+                      : 'var(--shadow-md), var(--shadow-inner)',
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+                  }}
                 >
-                  {plan.popular && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full flex items-center gap-1 whitespace-nowrap">
-                      <Sparkles className="h-3 w-3" /> Most Popular
-                    </span>
+                  {/* Popular badge */}
+                  {plan.isPopular && (
+                    <div
+                      className="absolute -top-3.5 left-1/2 -translate-x-1/2 flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest whitespace-nowrap"
+                      style={{
+                        backgroundColor: 'var(--color-brand)',
+                        color: 'var(--color-text-invert)',
+                      }}
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      Most Popular
+                    </div>
                   )}
 
                   <div className="space-y-6">
-                    {/* Plan header */}
-                    <div className="flex items-center gap-3 text-left">
-                      <div className={`p-2 rounded-xl bg-white/5`}>
-                        <Icon className={`h-5 w-5 ${plan.iconColor}`} />
+                    {/* Plan icon + name */}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex items-center justify-center w-10 h-10 rounded-xl shrink-0"
+                        style={{
+                          backgroundColor: isElite ? 'var(--color-brand-subtle)' : 'var(--color-bg-overlay)',
+                          border: isElite ? '1px solid var(--color-brand-border)' : '1px solid var(--color-border-base)',
+                        }}
+                      >
+                        <Icon className="h-5 w-5" style={{ color: isElite ? 'var(--color-brand)' : 'var(--color-text-secondary)' }} />
                       </div>
                       <div>
-                        <h2 className="font-bold text-lg text-white">{plan.name}</h2>
-                        <p className="text-xs text-zinc-500">{plan.description}</p>
+                        <h2 className="font-semibold text-base" style={{ color: 'var(--color-text-primary)' }}>{plan.name}</h2>
+                        <p className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>{plan.description}</p>
                       </div>
                     </div>
 
                     {/* Price */}
-                    <div className="text-left">
+                    <div>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-4xl font-extrabold text-white">₹{plan.price}</span>
-                        <span className="text-zinc-500 text-sm">/ {plan.period}</span>
+                        <span className="text-4xl font-extrabold" style={{ fontFamily: 'var(--font-inter, sans-serif)', color: 'var(--color-text-primary)' }}>
+                          ₹{plan.price}
+                        </span>
+                        <span className="text-sm" style={{ color: 'var(--color-text-tertiary)' }}>/ {plan.period}</span>
                       </div>
-                      <span className={`inline-block mt-2 text-xs font-semibold text-white px-2.5 py-1 rounded-lg ${plan.accentColor}`}>
-                        {plan.credits === 2 ? "2 Credits" : `${plan.credits} Credits`}
-                      </span>
+                      <div
+                        className="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold"
+                        style={{
+                          backgroundColor: isElite ? 'var(--color-brand-subtle)' : 'var(--color-bg-overlay)',
+                          color: isElite ? 'var(--color-brand)' : 'var(--color-text-secondary)',
+                          border: isElite ? '1px solid var(--color-brand-border)' : '1px solid var(--color-border-base)',
+                        }}
+                      >
+                        <Zap className="h-3 w-3" />
+                        {plan.credits} Credits
+                      </div>
                     </div>
 
                     {/* Features */}
-                    <ul className="space-y-2.5 text-left">
+                    <ul className="space-y-2.5">
                       {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-start gap-2.5 text-sm text-zinc-300">
-                          <Check className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                          <span>{feature}</span>
+                        <li key={i} className="flex items-center gap-2.5 text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                          <Check className="h-4 w-4 shrink-0" style={{ color: 'var(--color-success)' }} />
+                          {feature}
+                        </li>
+                      ))}
+                      {plan.excluded.map((feature, i) => (
+                        <li key={i} className="flex items-center gap-2.5 text-sm line-through" style={{ color: 'var(--color-text-tertiary)' }}>
+                          <div className="h-4 w-4 shrink-0 rounded-full flex items-center justify-center" style={{ border: '1px solid var(--color-border-base)' }}>
+                            <div className="h-1 w-2 rounded" style={{ backgroundColor: 'var(--color-border-strong)' }} />
+                          </div>
+                          {feature}
                         </li>
                       ))}
                     </ul>
@@ -301,57 +306,83 @@ function Pricing() {
 
                   {/* CTA */}
                   <div className="mt-8">
-                    {plan.id === "free" ? (
-                      <Button
-                        variant="outline"
-                        className="w-full rounded-xl py-5 border-zinc-700 text-zinc-500 bg-transparent cursor-default"
+                    {plan.isFree ? (
+                      <button
                         disabled
+                        className="w-full py-2.5 rounded-lg text-sm font-semibold cursor-default"
+                        style={{
+                          backgroundColor: 'var(--color-bg-overlay)',
+                          color: 'var(--color-text-tertiary)',
+                          border: '1px solid var(--color-border-base)',
+                        }}
                       >
                         {plan.buttonText}
-                      </Button>
+                      </button>
                     ) : !isLoaded ? (
-                      <Button className="w-full rounded-xl py-5" disabled>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      </Button>
+                      <button disabled className="w-full py-2.5 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-overlay)' }}>
+                        <Loader2 className="h-4 w-4 animate-spin" style={{ color: 'var(--color-text-secondary)' }} />
+                      </button>
                     ) : !user ? (
                       <SignInButton mode="modal" forceRedirectUrl="/pricing">
-                        <Button className="w-full rounded-xl py-5 bg-white text-black hover:bg-zinc-200 font-semibold">
-                          Sign In to Purchase
-                        </Button>
+                        <button
+                          className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all duration-100"
+                          style={{
+                            backgroundColor: isElite ? 'var(--color-brand)' : 'var(--color-bg-overlay)',
+                            color: isElite ? 'var(--color-text-invert)' : 'var(--color-text-primary)',
+                            border: isElite ? 'none' : '1px solid var(--color-border-strong)',
+                            boxShadow: isElite ? 'var(--shadow-brand)' : 'none',
+                          }}
+                        >
+                          Sign in to purchase
+                        </button>
                       </SignInButton>
                     ) : (
-                      <Button
+                      <button
                         onClick={() => handleCheckout(plan.id)}
                         disabled={loadingId !== null}
-                        className={`w-full rounded-xl py-5 font-semibold transition-all ${
-                          plan.id === "elite"
-                            ? "bg-purple-600 hover:bg-purple-500 text-white"
-                            : plan.id === "test"
-                            ? "bg-emerald-700 hover:bg-emerald-600 text-white"
-                            : "bg-blue-600 hover:bg-blue-500 text-white"
-                        }`}
+                        className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all duration-100 disabled:opacity-50"
+                        style={{
+                          backgroundColor: isElite ? 'var(--color-brand)' : 'var(--color-bg-overlay)',
+                          color: isElite ? 'var(--color-text-invert)' : 'var(--color-text-primary)',
+                          border: isElite ? 'none' : '1px solid var(--color-border-strong)',
+                          boxShadow: isElite ? 'var(--shadow-brand)' : 'none',
+                        }}
+                        onMouseEnter={e => {
+                          if (isElite) (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-brand-hover)';
+                        }}
+                        onMouseLeave={e => {
+                          if (isElite) (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-brand)';
+                        }}
                       >
-                        {loadingId === plan.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin mx-auto" />
-                        ) : (
-                          plan.buttonText
-                        )}
-                      </Button>
+                        {loadingId === plan.id
+                          ? <Loader2 className="h-4 w-4 animate-spin mx-auto" />
+                          : plan.buttonText
+                        }
+                      </button>
                     )}
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
 
-          {/* Footer note */}
-          <p className="text-zinc-600 text-xs">
-            Payments are processed securely by Razorpay. Credits never expire.
-          </p>
+          {/* Trust signals */}
+          <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
+            {[
+              '🔒 Secure payments via Razorpay',
+              '⚡ Credits never expire',
+              '🎯 No subscription traps',
+              '📞 Priority support for paid plans',
+            ].map((item) => (
+              <span key={item} className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
       </main>
     </div>
-  );
+  )
 }
 
-export default Pricing;
+export default Pricing

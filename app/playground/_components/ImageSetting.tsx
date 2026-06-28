@@ -216,7 +216,7 @@ function ImageSettingSection({ selectedElement }: Props) {
     
                 {/* Right Column: Upload Actions */}
                 <div className="space-y-2 w-full">
-                    <label className="text-xs font-medium text-slate-400 block sm:text-left text-center">Local Upload Source</label>
+                    <label className="text-xs font-medium text-slate-400 block sm:text-left text-center">Upload Image File</label>
                     <input
                         type="file"
                         accept="image/*"
@@ -231,7 +231,7 @@ function ImageSettingSection({ selectedElement }: Props) {
                         onClick={openFileDialog}
                         disabled={loading}
                     >
-                        Browse System
+                        Select Image
                     </Button>
                     <Button
                         type="button"
@@ -240,7 +240,7 @@ function ImageSettingSection({ selectedElement }: Props) {
                         disabled={loading || !selectedImage}
                     >
                         {loading ? <Loader2Icon className="h-3.5 w-3.5 animate-spin" /> : null}
-                        Commit Upload
+                        Upload Now
                     </Button>
                 </div>
             </div>
@@ -248,15 +248,15 @@ function ImageSettingSection({ selectedElement }: Props) {
             {/* AI Prompt Input Row */}
             <div className="space-y-1.5 border-t border-slate-900 pt-4">
                 <div className="flex items-center justify-between">
-                    <label className="text-xs font-semibold tracking-wide text-slate-400 uppercase">AI Tooling Prompt</label>
-                    <span className="text-[10px] text-slate-500 font-mono">Alt Attribute</span>
+                    <label className="text-xs font-semibold tracking-wide text-slate-400 uppercase">AI Image Generator</label>
+                    <span className="text-[10px] text-slate-500 font-mono">SEO Alt Description</span>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                         type="text"
                         value={altText}
                         onChange={(e) => setAltText(e.target.value)}
-                        placeholder="Describe your desired image..."
+                        placeholder="Describe the image you want AI to generate..."
                         className="flex-1 bg-slate-950/50 border-slate-800 text-sm h-9 placeholder:text-slate-600 focus-visible:ring-purple-500/30"
                     />
                     <Button 

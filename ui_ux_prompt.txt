@@ -1,0 +1,410 @@
+You are a Senior Product Designer, Staff UI Engineer, UX Researcher, and Frontend Architect.
+
+Your job is NOT to immediately rewrite code.
+
+PHASE 1 is ANALYSIS ONLY.
+
+I want you to deeply inspect my entire project before making any changes.
+
+The goal is to transform this project into something that looks like a premium VC-backed SaaS product while preserving 100% of the existing functionality.
+
+==================================================
+PHASE 1 — COMPLETE UI/UX AUDIT
+==================================================
+
+Analyze EVERYTHING.
+
+Inspect:
+
+• entire folder structure
+• every page
+• every component
+• every layout
+• routing
+• styling system
+• design tokens
+• spacing
+• typography
+• color system
+• animations
+• responsiveness
+• accessibility
+• loading states
+• empty states
+• error states
+• onboarding flow
+• forms
+• cards
+• buttons
+• modals
+• navigation
+• dashboard
+• profile pages
+• portfolio builder flow
+• AI interaction screens
+• authentication pages
+• mobile experience
+• desktop experience
+• tablet experience
+
+Also inspect:
+
+• duplicated components
+• inconsistent spacing
+• inconsistent padding
+• inconsistent margins
+• inconsistent border radius
+• inconsistent colors
+• inconsistent shadows
+• inconsistent font sizes
+• inconsistent icon sizes
+• alignment issues
+• visual hierarchy problems
+• UX friction
+• unnecessary clicks
+• accessibility problems
+• responsiveness issues
+• code smells in UI architecture
+
+==================================================
+OUTPUT A COMPLETE REPORT
+==================================================
+
+Do NOT edit anything yet.
+
+Give me:
+
+1. UI Audit
+
+Rate every screen from 1-10.
+
+Explain why.
+
+2. UX Audit
+
+Find every UX issue.
+
+3. Design Consistency Report
+
+Find every inconsistency.
+
+4. Component Audit
+
+List reusable components.
+
+List duplicated components.
+
+List components that should exist but don't.
+
+5. Typography Audit
+
+Explain font problems.
+
+Scale problems.
+
+Weight problems.
+
+Hierarchy problems.
+
+6. Spacing Audit
+
+Find every inconsistent spacing.
+
+7. Color Audit
+
+Analyze the palette.
+
+Contrast.
+
+Brand consistency.
+
+Accessibility.
+
+8. Layout Audit
+
+Analyze grids.
+
+Container widths.
+
+Section spacing.
+
+Alignment.
+
+9. Interaction Audit
+
+Hover states.
+
+Focus states.
+
+Loading states.
+
+Disabled states.
+
+Transitions.
+
+Animations.
+
+10. Accessibility Report
+
+WCAG issues.
+
+Keyboard navigation.
+
+ARIA.
+
+Contrast.
+
+Touch targets.
+
+11. Mobile Audit
+
+Everything wrong on mobile.
+
+12. Premium Design Score
+
+Give the project a score out of 100.
+
+Explain why.
+
+==================================================
+PHASE 2 — CREATE A DESIGN SYSTEM
+==================================================
+
+Only after the audit.
+
+Create a complete design language.
+
+Define:
+
+• spacing scale
+• typography scale
+• radius system
+• elevation system
+• shadow system
+• animation system
+• color tokens
+• semantic colors
+• breakpoints
+• grid
+• icon sizes
+• button variants
+• card variants
+• input variants
+
+The design system should feel inspired by:
+
+Linear
+
+Stripe
+
+Notion
+
+Framer
+
+Vercel
+
+Apple
+
+Raycast
+
+OpenAI
+
+without copying any of them.
+
+The result should feel unique and premium.
+
+==================================================
+PHASE 3 — REDESIGN
+==================================================
+
+Now redesign the ENTIRE project.
+
+Rules:
+
+Do NOT change functionality.
+
+Do NOT break routing.
+
+Do NOT change APIs.
+
+Do NOT change business logic.
+
+Only improve UI and UX.
+
+Every page should feel:
+
+clean
+
+minimal
+
+luxurious
+
+premium
+
+modern
+
+balanced
+
+professional
+
+consistent
+
+beautiful
+
+Every screen should have:
+
+proper spacing
+
+clear hierarchy
+
+consistent typography
+
+beautiful cards
+
+smooth animations
+
+professional empty states
+
+better loading skeletons
+
+better error UI
+
+better responsive behavior
+
+modern dashboard aesthetics
+
+premium forms
+
+consistent buttons
+
+consistent inputs
+
+glassmorphism only where appropriate
+
+subtle gradients
+
+soft shadows
+
+micro interactions
+
+excellent accessibility
+
+==================================================
+PORTFOLIO BUILDER SPECIFIC
+==================================================
+
+This is an AI Portfolio Builder.
+
+The experience should make users feel like they are creating something valuable.
+
+Improve:
+
+landing page
+
+AI generation flow
+
+stepper
+
+progress indicators
+
+editing experience
+
+live preview
+
+resume upload
+
+theme selection
+
+portfolio templates
+
+publish flow
+
+success screens
+
+dashboard
+
+portfolio analytics
+
+settings
+
+profile
+
+Make every interaction delightful.
+
+==================================================
+PHASE 4 — IMPLEMENTATION PLAN
+==================================================
+
+Before changing code,
+
+produce a roadmap.
+
+Group changes into:
+
+Phase A
+
+Phase B
+
+Phase C
+
+Estimate complexity.
+
+List affected files.
+
+List reusable components.
+
+==================================================
+PHASE 5 — IMPLEMENTATION
+==================================================
+
+Now implement everything.
+
+Requirements:
+
+Never rewrite working logic.
+
+Only refactor UI.
+
+Prefer reusable components.
+
+Reduce duplicated code.
+
+Improve maintainability.
+
+Follow SOLID principles.
+
+Use clean architecture.
+
+==================================================
+QUALITY BAR
+==================================================
+
+Before finishing, verify:
+
+✓ Every page is visually consistent
+
+✓ Every spacing follows the design system
+
+✓ Every component uses shared styles
+
+✓ Mobile is polished
+
+✓ Desktop is premium
+
+✓ Tablet works
+
+✓ Animations are smooth
+
+✓ No UI regressions
+
+✓ Accessibility improved
+
+✓ Performance maintained
+
+If anything does not meet premium SaaS quality, continue refining until it does.
+
+The final result should look like a modern product that could compete with Linear, Vercel, Framer, or Stripe in terms of polish while maintaining its own identity.
+
+Never stop after a partial redesign.
+
+Transform the ENTIRE application.
