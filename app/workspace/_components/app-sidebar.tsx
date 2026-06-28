@@ -167,7 +167,7 @@ export function AppSidebar() {
                     <div className="mx-1">
                         {isPro ? (
                             <div
-                                className="p-3 rounded-xl flex items-center gap-3"
+                                className="p-3 rounded-xl flex items-center gap-3 w-full"
                                 style={{
                                     background: 'linear-gradient(135deg, rgb(251 191 36 / 10%), rgb(245 158 11 / 5%))',
                                     border: '1px solid var(--color-brand-border)',
@@ -179,8 +179,13 @@ export function AppSidebar() {
                                 >
                                     <Crown className="h-4 w-4" />
                                 </div>
-                                <div>
-                                    <p className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>Pro Plan</p>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <p className="text-sm font-semibold truncate" style={{ color: 'var(--color-text-primary)' }}>Pro Plan</p>
+                                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-brand/10 text-brand border border-brand-border shrink-0 select-none">
+                                            {!userDetail ? <Loader2Icon className="animate-spin h-2.5 w-2.5" /> : `${userDetail.credits} Cr`}
+                                        </span>
+                                    </div>
                                     <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>Unlimited access</p>
                                 </div>
                             </div>
