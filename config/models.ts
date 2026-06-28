@@ -18,12 +18,7 @@ export const AI_MODELS = [
       logo: "/model-logo/xiaomi.png",
       premium: true,
     },
-    {
-      id: "openai/gpt-5.4-nano",
-      name: "OpenAI GPT-5.4 Nano",
-      logo: "/model-logo/openai.svg",
-      premium: false,
-    },
+   
     {
       id: "google/gemini-3.5-flash",
       name: "Google Gemini 3.5 Flash",
