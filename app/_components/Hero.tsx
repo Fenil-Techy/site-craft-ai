@@ -1,5 +1,4 @@
 'use client';
-import { Button } from '@/components/ui/button'
 import UserDetailContext from '@/context/UserDetailContext';
 import { SignInButton, useAuth, useUser } from '@clerk/nextjs';
 import axios from 'axios';
@@ -8,7 +7,7 @@ import {
   GraduationCap, Loader2Icon, Palette, Rocket, Smartphone,
   Sparkles,
 } from 'lucide-react'
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React, { useContext, useState } from 'react'
 import { toast } from 'sonner';
 import { Loader } from '@/components/ui/loader';
@@ -25,8 +24,6 @@ import Image from 'next/image';
 
 function Hero() {
   const router = useRouter()
-  const pathname = usePathname()
-  const isWorkspace = pathname === '/workspace'
   const [userInput, setUserInput] = useState<string>()
   const { user, isLoaded } = useUser()
   const [loading, setLoading] = useState(false)
@@ -403,13 +400,6 @@ function Hero() {
         </div>
       </div>
 
-      {/* Trust line */}
-      <p
-        className="mt-8 text-xs animate-fade-up"
-        style={{ color: 'var(--color-text-tertiary)', animationDelay: '300ms' }}
-      >
-        No credit card required &nbsp;·&nbsp; Free portfolio generation &nbsp;·&nbsp; Own your portfolio forever
-      </p>
     </div>
   )
 }

@@ -94,7 +94,7 @@ function Benefits() {
                 </div>
               </div>
               <p className="text-[10px] text-zinc-400 leading-relaxed font-mono">
-                "Deploying transformer models for real-time natural language benchmarks."
+                {"\"Deploying transformer models for real-time natural language benchmarks.\""}
               </p>
 
               {/* Floating Settings bubble mockup */}

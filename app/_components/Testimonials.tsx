@@ -50,7 +50,7 @@ function Testimonials() {
               <Quote className="absolute top-4 right-4 h-8 w-8 opacity-5 select-none" style={{ color: 'var(--color-text-primary)' }} />
               
               <p className="text-xs leading-relaxed italic z-10" style={{ color: 'var(--color-text-secondary)' }}>
-                "{rev.quote}"
+                &quot;{rev.quote}&quot;
               </p>
 
               <div className="mt-6 pt-3" style={{ borderTop: '1px solid var(--color-border-base)' }}>

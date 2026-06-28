@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { Sparkles, Edit3, ArrowRight, Check } from 'lucide-react'
+import { Sparkles, Check } from 'lucide-react'
 
 function HowItWorks() {
   return (
@@ -21,12 +21,12 @@ function HowItWorks() {
               <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/40" />
               <div className="w-2.5 h-2.5 rounded-full bg-green-500/40" />
             </div>
-
+            
             {/* Prompt Input Bubble */}
             <div className="rounded-xl p-3.5 text-xs text-left" style={{ backgroundColor: 'var(--color-bg-raised)', border: '1px solid var(--color-border-base)' }}>
               <p className="font-semibold text-zinc-400 mb-1">USER INPUT</p>
               <p className="text-zinc-200 leading-relaxed font-mono">
-                "Create a responsive dark portfolio for a Machine Learning engineer. Add key skill bars, recent papers, and an earthy orange brand theme."
+                {"\"Create a responsive dark portfolio for a Machine Learning engineer. Add key skill bars, recent papers, and an earthy orange brand theme.\""}
               </p>
             </div>
 
