@@ -134,6 +134,7 @@ Use only:
 * HTML5 elements
 * Tailwind CSS classes (including hover, active, focus states, and responsive sm/md/lg prefixes)
 * Alpine.js only when interaction is needed
+* Flowbite JS / data attributes (e.g. \`data-collapse-toggle\`, \`data-dropdown-toggle\`) for interactive components like mobile navigation hamburger toggles, dropdowns, and accordions
 * Lucide icons (render as <i data-lucide="icon-name"></i>)
 
 Everything must work inside a single body container.
@@ -253,15 +254,13 @@ Always:
 * Use rounded-2xl or rounded-3xl
 * Provide meaningful alt text
 
----
-
 # RESPONSIVENESS
 
 Must be mobile-first.
 
 Support:
 
-* Mobile
+* Mobile (must include a responsive header navigation bar with a hamburger menu that toggles dynamically using Flowbite attributes)
 * Tablet
 * Desktop
 * Large Desktop
