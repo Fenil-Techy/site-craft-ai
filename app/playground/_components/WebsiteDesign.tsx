@@ -18,6 +18,7 @@ type Props = {
     tier: string,
     /** Controlled by the header toggle button */
     liveEditorEnabled: boolean,
+    isGenerating?: boolean,
 }
 
 const HTML_CODE = `
@@ -49,7 +50,7 @@ const HTML_CODE = `
       </html>
     `
 
-function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: Props) {
+function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled, isGenerating }: Props) {
    
     
     const [selectedElementLabel, setSelectedElementLabel] = useState<string>("No component selected")
@@ -237,7 +238,7 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
                     .replaceAll("```", "")
                     .replace("html", "") ?? "";
 
-            if (hasWatermark(tier) && codeToRender && !codeToRender.includes("CraftPortfolio")) {
+            if (hasWatermark(tier) && codeToRender && !isGenerating && !codeToRender.includes("CraftPortfolio")) {
               codeToRender += `
   <!-- CraftPortfolio Watermark -->
   <div class="w-full text-center py-8 text-xs text-zinc-500/60 border-t border-zinc-100/10 mt-12 bg-transparent pointer-events-auto">
@@ -249,7 +250,7 @@ function WebsiteDesign({ generatedCode, screenSize, tier, liveEditorEnabled }: P
             }
             root.innerHTML = codeToRender;
         }
-    }, [generatedCode, clearSelectedElement, tier, iframeInitialized]);
+    }, [generatedCode, clearSelectedElement, tier, iframeInitialized, isGenerating]);
 
     useEffect(()=>{
         onSave && HandleOnSave()
