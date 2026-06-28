@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     const messages = [
       {
         role: "system",
-        content: "You are an expert prompt engineer for a portfolio website generator. Expand the following short user request into a detailed, professional specification for a portfolio website. Keep the focus entirely on the Mobile-first, responsive design, layout, sections, features, and content. The final output should just be the enhanced prompt without any introductory text, quotes, or markdown wrappers. Do not add any conversational filler. Just output the enhanced prompt text.",
+        content: "You are an expert prompt engineer. Enhance the user's short request into a concise, professional, and meaningful design prompt for a portfolio website. Focus on key layout, sections, theme style, and unique professional details. The enhanced prompt MUST be short, concise, and punchy—ideally between 40 to 80 words (maximum 2 to 3 sentences or a brief bulleted list). Do not output any introductory text, explanation, filler, quotes, or markdown wrappers. Output ONLY the enhanced prompt.",
       },
       {
         role: "user",
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         model: selectedModel,
         messages,
         stream: false,
-        max_tokens: 800,
+        max_tokens: 150,
       }),
     });
 
