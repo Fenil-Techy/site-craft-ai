@@ -11,7 +11,7 @@ function WorkSpaceLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <div className="relative flex w-full min-h-screen flex-col overflow-hidden">
+      <div className="relative flex w-full min-h-screen flex-col overflow-hidden bg-lovable-mesh">
         <AppHeader />
         {children}
       </div>
