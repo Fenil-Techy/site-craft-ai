@@ -186,7 +186,7 @@ export function AppSidebar() {
                                             {!userDetail ? <Loader2Icon className="animate-spin h-2.5 w-2.5" /> : `${userDetail.credits} Cr`}
                                         </span>
                                     </div>
-                                    <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>Unlimited access</p>
+                                    <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>Active Plan</p>
                                 </div>
                             </div>
                         ) : (
