@@ -54,33 +54,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Evaluate Clerk tier status
-    const { has } = await auth();
-    const hasUnlimitedAccess = has({ plan: "pro" }) || isUpgradedTier(dbUser.tier);
-
     // 4. Handle Credits check securely WITHOUT db.transaction
-    if (!hasUnlimitedAccess) {
-      // ATOMIC UPDATE: Deduct a credit using clean template literal sql string injections
-      const updateResult = await db
-        .update(usersTable)
-        .set({
-          // This maps natively to PostgreSQL: SET "credits" = "credits" - 1
-          credits: sql`${usersTable.credits} - 1`, 
-        })
-        .where(
-          and(
-            eq(usersTable.id, dbUser.id),
-            gt(usersTable.credits, 0) // Ensures user balance cannot pass under 0!
-          )
-        );
-    
-      // If rowCount is 0, the block intercepts script spammers safely
-      if (updateResult.rowCount === 0) {
-        return NextResponse.json(
-          { error: "Insufficient credits. Generation blocked." },
-          { status: 403 }
-        );
-      }
+    // ATOMIC UPDATE: Deduct a credit using clean template literal sql string injections
+    const updateResult = await db
+      .update(usersTable)
+      .set({
+        // This maps natively to PostgreSQL: SET "credits" = "credits" - 1
+        credits: sql`${usersTable.credits} - 1`, 
+      })
+      .where(
+        and(
+          eq(usersTable.id, dbUser.id),
+          gt(usersTable.credits, 0) // Ensures user balance cannot pass under 0!
+        )
+      );
+  
+    // If rowCount is 0, the block intercepts script spammers safely
+    if (updateResult.rowCount === 0) {
+      return NextResponse.json(
+        { error: "Insufficient credits. Generation blocked." },
+        { status: 403 }
+      );
     }
 
     // 4.10 Generate Title
