@@ -2,7 +2,7 @@
 
 CraftPortfolio is a modern, high-performance web application designed to generate stunning, professional, and recruiter-ready personal portfolios in under 60 seconds from a single English prompt.
 
-Live URL: **[brocaption.vercel.app](https://brocaption.vercel.app)**
+Live URL: **[craftportfolio.online](https://craftportfolio.online)**
 ---
 
 ##  Key Features
