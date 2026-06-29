@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import React from 'react'
+import { Mail, Lock } from 'lucide-react'
 
 const footerLinks = {
   Product: [
@@ -49,10 +50,7 @@ function Footer() {
               className="inline-flex items-center gap-1.5 text-xs transition-colors hover:underline"
               style={{ color: 'var(--color-text-tertiary)' }}
             >
-              <svg width="13" height="13" viewBox="0 0 16 16" fill="none">
-                <path d="M2 4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4Z" stroke="currentColor" strokeWidth="1.2"/>
-                <path d="M2 4l6 5 6-5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-              </svg>
+              <Mail className="w-3 h-3" />
               fenilkapopara34@gmail.com
             </a>
           </div>
@@ -94,11 +92,8 @@ function Footer() {
             © {new Date().getFullYear()} CraftPortfolio. All rights reserved.
           </p>
           <div className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <rect x="1" y="1" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.2"/>
-              <path d="M4 6h4M6 4v4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-            </svg>
-            🔒 256-bit SSL Secured
+            <Lock className="w-3.5 h-3.5" style={{ color: 'var(--color-brand)' }} />
+            256-bit SSL Secured
           </div>
         </div>
       </div>

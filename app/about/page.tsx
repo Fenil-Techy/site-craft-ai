@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ChevronLeft, Zap, Palette, SlidersHorizontal, ShieldCheck, Cloud, Share2, ArrowRight } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -18,32 +19,32 @@ const stats = [
 
 const features = [
   {
-    icon: '⚡',
+    icon: Zap,
     title: 'Lightning Fast',
     desc: 'Generate a complete, polished portfolio website in under a minute using state-of-the-art AI.',
   },
   {
-    icon: '🎨',
+    icon: Palette,
     title: 'Beautiful Design',
     desc: 'Every portfolio is crafted with premium aesthetics — dark themes, smooth animations, and recruiter-ready layouts.',
   },
   {
-    icon: '🔧',
+    icon: SlidersHorizontal,
     title: 'Fully Customizable',
     desc: 'Chat with AI to iterate and refine your portfolio. Change colors, sections, layout, and content in real-time.',
   },
   {
-    icon: '🔒',
+    icon: ShieldCheck,
     title: 'Secure & Private',
     desc: 'Enterprise-grade security with Clerk authentication, 256-bit SSL, and strict privacy controls.',
   },
   {
-    icon: '☁️',
+    icon: Cloud,
     title: 'Cloud-Hosted',
     desc: 'Your portfolio data is securely stored in the cloud and accessible from anywhere, anytime.',
   },
   {
-    icon: '🚀',
+    icon: Share2,
     title: 'Instant Publish',
     desc: 'Share your portfolio with a single link. No complicated deployment or hosting setup required.',
   },
@@ -70,26 +71,12 @@ export default function AboutPage() {
         <div className="mx-auto max-w-4xl px-6 py-20 relative">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm mb-10 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm mb-10 transition-colors hover:text-zinc-200"
             style={{ color: 'var(--color-text-tertiary)' }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ChevronLeft className="w-4 h-4" />
             Back to Home
           </Link>
-
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6"
-            style={{
-              backgroundColor: 'rgba(251,191,36,0.1)',
-              border: '1px solid rgba(251,191,36,0.2)',
-              color: 'var(--color-brand)',
-            }}
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-            Building the future of portfolios
-          </div>
 
           <h1
             className="text-5xl font-bold tracking-tight mb-6 leading-tight"
@@ -189,24 +176,32 @@ export default function AboutPage() {
             Everything you need to go from idea to live portfolio — in minutes.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {features.map((feat) => (
-              <div
-                key={feat.title}
-                className="p-5 rounded-xl transition-all duration-200 hover:-translate-y-0.5"
-                style={{
-                  backgroundColor: 'var(--color-bg-surface)',
-                  border: '1px solid var(--color-border-base)',
-                }}
-              >
-                <div className="text-2xl mb-3">{feat.icon}</div>
-                <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                  {feat.title}
-                </h3>
-                <p className="text-xs leading-5" style={{ color: 'var(--color-text-secondary)' }}>
-                  {feat.desc}
-                </p>
-              </div>
-            ))}
+            {features.map((feat) => {
+              const Icon = feat.icon
+              return (
+                <div
+                  key={feat.title}
+                  className="p-5 rounded-xl transition-all duration-200 hover:-translate-y-0.5"
+                  style={{
+                    backgroundColor: 'var(--color-bg-surface)',
+                    border: '1px solid var(--color-border-base)',
+                  }}
+                >
+                  <div
+                    className="w-9 h-9 rounded-lg flex items-center justify-center mb-4"
+                    style={{ backgroundColor: 'rgba(251,191,36,0.08)' }}
+                  >
+                    <Icon className="w-4 h-4" style={{ color: 'var(--color-brand)' }} />
+                  </div>
+                  <h3 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                    {feat.title}
+                  </h3>
+                  <p className="text-xs leading-5" style={{ color: 'var(--color-text-secondary)' }}>
+                    {feat.desc}
+                  </p>
+                </div>
+              )
+            })}
           </div>
         </div>
 
@@ -238,9 +233,7 @@ export default function AboutPage() {
               }}
             >
               Get Started Free
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
               href="/contact"

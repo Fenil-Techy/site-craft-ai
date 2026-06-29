@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { ChevronLeft, Mail, Clock, ArrowRight, CheckCircle, ExternalLink } from 'lucide-react'
 
 export default function ContactPageClient() {
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
@@ -35,26 +36,12 @@ export default function ContactPageClient() {
         <div className="mx-auto max-w-4xl px-6 py-16">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm mb-8 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm mb-10 transition-colors hover:text-zinc-200"
             style={{ color: 'var(--color-text-tertiary)' }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ChevronLeft className="w-4 h-4" />
             Back to Home
           </Link>
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.2)' }}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M3 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5Z" stroke="#fbbf24" strokeWidth="1.4"/>
-                <path d="M3 5l7 6 7-6" stroke="#fbbf24" strokeWidth="1.4" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <span className="text-sm font-medium" style={{ color: 'var(--color-brand)' }}>Support</span>
-          </div>
           <h1 className="text-4xl font-bold tracking-tight mb-3" style={{ fontFamily: 'var(--font-inter, sans-serif)' }}>
             Contact Us
           </h1>
@@ -80,24 +67,14 @@ export default function ContactPageClient() {
             </div>
 
             <ContactInfoCard
-              icon={
-                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                  <path d="M3 5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5Z" stroke="#fbbf24" strokeWidth="1.4"/>
-                  <path d="M3 5l7 6 7-6" stroke="#fbbf24" strokeWidth="1.4" strokeLinecap="round"/>
-                </svg>
-              }
+              icon={<Mail className="w-4 h-4" style={{ color: 'var(--color-brand)' }} />}
               label="Email"
               value="fenilkapopara34@gmail.com"
               href="mailto:fenilkapopara34@gmail.com"
             />
 
             <ContactInfoCard
-              icon={
-                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                  <circle cx="10" cy="10" r="7" stroke="#fbbf24" strokeWidth="1.4"/>
-                  <path d="M10 6v4l3 3" stroke="#fbbf24" strokeWidth="1.4" strokeLinecap="round"/>
-                </svg>
-              }
+              icon={<Clock className="w-4 h-4" style={{ color: 'var(--color-brand)' }} />}
               label="Response Time"
               value="Within 24–48 hours"
             />
@@ -105,25 +82,28 @@ export default function ContactPageClient() {
             <div
               className="p-4 rounded-xl text-sm"
               style={{
-                backgroundColor: 'rgba(251,191,36,0.06)',
-                border: '1px solid rgba(251,191,36,0.15)',
+                backgroundColor: 'var(--color-bg-surface)',
+                border: '1px solid var(--color-border-base)',
                 color: 'var(--color-text-secondary)',
               }}
             >
-              <p className="font-medium mb-1" style={{ color: 'var(--color-brand)' }}>💡 Quick Links</p>
-              <ul className="space-y-1.5 mt-2">
+              <p className="font-semibold text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-tertiary)' }}>Quick Links</p>
+              <ul className="space-y-2">
                 <li>
-                  <Link href="/privacy-policy" className="hover:underline" style={{ color: 'var(--color-text-secondary)' }}>
+                  <Link href="/privacy-policy" className="inline-flex items-center gap-1.5 text-sm hover:underline" style={{ color: 'var(--color-text-secondary)' }}>
+                    <ExternalLink className="w-3 h-3" />
                     Privacy Policy
                   </Link>
                 </li>
                 <li>
-                  <Link href="/terms-and-conditions" className="hover:underline" style={{ color: 'var(--color-text-secondary)' }}>
+                  <Link href="/terms-and-conditions" className="inline-flex items-center gap-1.5 text-sm hover:underline" style={{ color: 'var(--color-text-secondary)' }}>
+                    <ExternalLink className="w-3 h-3" />
                     Terms &amp; Conditions
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="hover:underline" style={{ color: 'var(--color-text-secondary)' }}>
+                  <Link href="/pricing" className="inline-flex items-center gap-1.5 text-sm hover:underline" style={{ color: 'var(--color-text-secondary)' }}>
+                    <ExternalLink className="w-3 h-3" />
                     Pricing
                   </Link>
                 </li>
@@ -143,12 +123,10 @@ export default function ContactPageClient() {
               {formState === 'success' ? (
                 <div className="text-center py-10">
                   <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                    style={{ backgroundColor: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.3)' }}
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5"
+                    style={{ backgroundColor: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.2)' }}
                   >
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 13l4 4L19 7" stroke="#fbbf24" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    <CheckCircle className="w-7 h-7" style={{ color: 'var(--color-brand)' }} />
                   </div>
                   <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
                     Message Sent!
@@ -258,11 +236,7 @@ export default function ContactPageClient() {
                     }}
                   >
                     {formState === 'submitting' ? 'Opening email…' : 'Send Message'}
-                    {formState !== 'submitting' && (
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    )}
+                    {formState !== 'submitting' && <ArrowRight className="w-4 h-4" />}
                   </button>
                   <p className="text-xs text-center" style={{ color: 'var(--color-text-tertiary)' }}>
                     This will open your email client with a pre-filled message.
@@ -295,7 +269,7 @@ function ContactInfoCard({
       }}
     >
       <div
-        className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
+        className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
         style={{ backgroundColor: 'rgba(251,191,36,0.08)' }}
       >
         {icon}

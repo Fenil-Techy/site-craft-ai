@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import Header from '../_components/Header'
-import { Check, Crown, Loader2, Sparkles, Zap } from 'lucide-react'
+import { Check, Crown, Loader2, Sparkles, Zap, ShieldCheck, Target, Headphones, X, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { useUser, SignInButton } from '@clerk/nextjs'
 import Script from 'next/script'
@@ -295,9 +295,7 @@ function Pricing() {
                       ))}
                       {plan.excluded.map((feature, i) => (
                         <li key={i} className="flex items-center gap-2.5 text-sm line-through" style={{ color: 'var(--color-text-tertiary)' }}>
-                          <div className="h-4 w-4 shrink-0 rounded-full flex items-center justify-center" style={{ border: '1px solid var(--color-border-base)' }}>
-                            <div className="h-1 w-2 rounded" style={{ backgroundColor: 'var(--color-border-strong)' }} />
-                          </div>
+                          <X className="h-4 w-4 shrink-0" style={{ color: 'var(--color-text-tertiary)' }} />
                           {feature}
                         </li>
                       ))}
@@ -369,15 +367,19 @@ function Pricing() {
           {/* Trust signals */}
           <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
             {[
-              '🔒 Secure payments via Razorpay',
-              '⚡ Credits never expire',
-              '🎯 No subscription traps',
-              '📞 Priority support for paid plans',
-            ].map((item) => (
-              <span key={item} className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
-                {item}
-              </span>
-            ))}
+              { icon: ShieldCheck, text: 'Secure payments via Razorpay' },
+              { icon: Zap, text: 'Credits never expire' },
+              { icon: Target, text: 'No subscription traps' },
+              { icon: Headphones, text: 'Priority support for paid plans' },
+            ].map((item, index) => {
+              const Icon = item.icon
+              return (
+                <span key={index} className="inline-flex items-center gap-1.5 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+                  <Icon className="w-3.5 h-3.5" style={{ color: 'var(--color-brand)' }} />
+                  {item.text}
+                </span>
+              )
+            })}
           </div>
         </div>
       </main>

@@ -1,6 +1,7 @@
 'use client' // Error boundaries must be Client Components
 
 import Link from 'next/link'
+import { AlertTriangle, RefreshCw, Home, MessageCircle } from 'lucide-react'
 
 export default function GlobalError({
   error,
@@ -42,19 +43,10 @@ export default function GlobalError({
             border: '1px solid rgba(239,68,68,0.2)',
           }}
         >
-          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-            <path
-              d="M18 4L32.93 28H3.07L18 4Z"
-              stroke="#ef4444"
-              strokeWidth="2"
-              strokeLinejoin="round"
-            />
-            <path d="M18 15v6" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" />
-            <circle cx="18" cy="25" r="1.5" fill="#ef4444" />
-          </svg>
+          <AlertTriangle className="w-9 h-9" style={{ color: '#ef4444' }} />
         </div>
 
-        {/* Error code/title */}
+        {/* Error title */}
         <div
           className="text-7xl font-black leading-none mb-4 select-none"
           style={{
@@ -106,9 +98,7 @@ export default function GlobalError({
               boxShadow: '0 0 20px rgba(251,191,36,0.2)',
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M2 8a6 6 0 1 1 1.5 4M2 12V8h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <RefreshCw className="w-4 h-4" />
             Try Again
           </button>
           <Link
@@ -121,15 +111,14 @@ export default function GlobalError({
               border: '1px solid var(--color-border-base)',
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 3L2 8h2v5h4v-3h2v3h4V8h2L8 3Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
-            </svg>
+            <Home className="w-4 h-4" />
             Go Home
           </Link>
         </div>
 
         {/* Help link */}
-        <p className="mt-10 text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+        <p className="mt-10 text-xs flex items-center justify-center gap-1.5" style={{ color: 'var(--color-text-tertiary)' }}>
+          <MessageCircle className="w-3.5 h-3.5" />
           Problem persisting?{' '}
           <Link
             href="/contact"

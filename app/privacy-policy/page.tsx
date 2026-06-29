@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ChevronLeft, Mail, Globe } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -23,27 +24,12 @@ export default function PrivacyPolicy() {
         <div className="mx-auto max-w-4xl px-6 py-16">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm mb-8 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm mb-10 transition-colors hover:text-zinc-200"
             style={{ color: 'var(--color-text-tertiary)' }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ChevronLeft className="w-4 h-4" />
             Back to Home
           </Link>
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.2)' }}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M10 2a6 6 0 0 1 6 6v1.5a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 4 9.5V8a6 6 0 0 1 6-6Z" stroke="#fbbf24" strokeWidth="1.4"/>
-                <rect x="6" y="11" width="8" height="7" rx="1.5" stroke="#fbbf24" strokeWidth="1.4"/>
-                <circle cx="10" cy="14.5" r="1" fill="#fbbf24"/>
-              </svg>
-            </div>
-            <span className="text-sm font-medium" style={{ color: 'var(--color-brand)' }}>Legal</span>
-          </div>
           <h1 className="text-4xl font-bold tracking-tight mb-3" style={{ fontFamily: 'var(--font-inter, sans-serif)' }}>
             Privacy Policy
           </h1>
@@ -214,9 +200,9 @@ function ContactCard() {
         border: '1px solid var(--color-border-base)',
       }}
     >
-      <p className="font-semibold text-sm mb-1" style={{ color: 'var(--color-text-primary)' }}>CraftPortfolio</p>
-      <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-        Email:{' '}
+      <p className="font-semibold text-sm mb-3" style={{ color: 'var(--color-text-primary)' }}>CraftPortfolio</p>
+      <p className="text-sm flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
+        <Mail className="w-4 h-4 shrink-0" style={{ color: 'var(--color-brand)' }} />
         <a
           href="mailto:fenilkapopara34@gmail.com"
           style={{ color: 'var(--color-brand)' }}
@@ -225,8 +211,8 @@ function ContactCard() {
           fenilkapopara34@gmail.com
         </a>
       </p>
-      <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-        Website:{' '}
+      <p className="text-sm flex items-center gap-2 mt-2" style={{ color: 'var(--color-text-secondary)' }}>
+        <Globe className="w-4 h-4 shrink-0" style={{ color: 'var(--color-brand)' }} />
         <a
           href="https://www.craftportfolio.online"
           style={{ color: 'var(--color-brand)' }}

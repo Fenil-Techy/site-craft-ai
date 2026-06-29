@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { Home, MessageCircle } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: '404 — Page Not Found',
@@ -87,9 +88,7 @@ export default function NotFound() {
               boxShadow: '0 0 20px rgba(251,191,36,0.2)',
             }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 3L2 8h2v5h4v-3h2v3h4V8h2L8 3Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
-            </svg>
+            <Home className="w-4 h-4" />
             Go Home
           </Link>
           <Link
@@ -102,6 +101,7 @@ export default function NotFound() {
               border: '1px solid var(--color-border-base)',
             }}
           >
+            <MessageCircle className="w-4 h-4" />
             Contact Support
           </Link>
         </div>

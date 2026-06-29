@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { ChevronLeft } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Terms and Conditions',
@@ -23,26 +24,12 @@ export default function TermsAndConditions() {
         <div className="mx-auto max-w-4xl px-6 py-16">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-sm mb-8 transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm mb-10 transition-colors hover:text-zinc-200"
             style={{ color: 'var(--color-text-tertiary)' }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <ChevronLeft className="w-4 h-4" />
             Back to Home
           </Link>
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center"
-              style={{ backgroundColor: 'rgba(251,191,36,0.12)', border: '1px solid rgba(251,191,36,0.2)' }}
-            >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path d="M5 3h10a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="#fbbf24" strokeWidth="1.4"/>
-                <path d="M7 7h6M7 10h6M7 13h4" stroke="#fbbf24" strokeWidth="1.4" strokeLinecap="round"/>
-              </svg>
-            </div>
-            <span className="text-sm font-medium" style={{ color: 'var(--color-brand)' }}>Legal</span>
-          </div>
           <h1 className="text-4xl font-bold tracking-tight mb-3" style={{ fontFamily: 'var(--font-inter, sans-serif)' }}>
             Terms &amp; Conditions
           </h1>
