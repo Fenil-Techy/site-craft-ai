@@ -2,14 +2,20 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import type { Metadata } from "next";
 import { ClerkProvider } from '@clerk/nextjs'
 import { dark } from '@clerk/ui/themes'
+import Script from "next/script";
 import "./globals.css";
 import Provider from "./provider";
 import { Toaster } from "@/components/ui/sonner";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from "@vercel/analytics/next"
 
+const GA_ID = "G-LE6LDNG9NZ";
+
 export const metadata: Metadata = {
-  title: "CraftPortfolio — AI Portfolio Builder",
+  title: {
+    default: "CraftPortfolio — AI Portfolio Builder",
+    template: "%s | CraftPortfolio",
+  },
   description:
     "Generate a stunning, professional portfolio website in seconds with AI. Describe your skills and let CraftPortfolio build a premium, recruiter-ready site instantly.",
   keywords: [
@@ -18,24 +24,57 @@ export const metadata: Metadata = {
     "AI website builder",
     "developer portfolio",
     "professional portfolio",
+    "portfolio maker",
+    "resume website builder",
     "CraftPortfolio",
+    "free portfolio builder",
+    "online portfolio creator",
   ],
   authors: [{ name: "CraftPortfolio" }],
+  creator: "CraftPortfolio",
+  publisher: "CraftPortfolio",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "https://www.craftportfolio.online",
+  },
   openGraph: {
     title: "CraftPortfolio — AI Portfolio Builder",
     description:
-      "Generate a stunning, professional portfolio website in seconds with AI.",
+      "Generate a stunning, professional portfolio website in seconds with AI. Build a recruiter-ready portfolio site in seconds.",
     url: "https://www.craftportfolio.online",
     siteName: "CraftPortfolio",
     type: "website",
+    locale: "en_US",
+    images: [
+      {
+        url: "https://www.craftportfolio.online/android-chrome-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "CraftPortfolio – AI Portfolio Builder",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "CraftPortfolio — AI Portfolio Builder",
     description:
       "Generate a stunning, professional portfolio website in seconds with AI.",
+    images: ["https://www.craftportfolio.online/android-chrome-512x512.png"],
   },
   metadataBase: new URL("https://www.craftportfolio.online"),
+  verification: {
+    google: undefined, // Add Google Search Console verification token here when available
+  },
 };
 
 export default function RootLayout({
@@ -51,6 +90,36 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="font-sans antialiased" style={{backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)'}}>
+      {/* Google Analytics 4 */}
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script id="ga4-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', '${GA_ID}', { page_path: window.location.pathname });
+        `}
+      </Script>
+      {/* JSON-LD Structured Data */}
+      <Script id="json-ld-org" type="application/ld+json" strategy="afterInteractive">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "CraftPortfolio",
+          "url": "https://www.craftportfolio.online",
+          "description": "Generate a stunning, professional portfolio website in seconds with AI.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "All",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        })}
+      </Script>
       <ClerkProvider
     appearance={{
     theme: dark,
